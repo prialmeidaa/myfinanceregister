@@ -12,7 +12,12 @@ Also consult the [test.md](.github/agents/test.md) document.
 
 - `src/main/kotlin/`: Kotlin application code.
   - `paa/myfinanceregister/MyFinanceRegisterApplication.kt`: Spring Boot entry point and main configuration.
-  - `paa/myfinanceregister/MainView.kt`: Vaadin screen currently configured on the root route (`/`).
+  - `paa/myfinanceregister/MainView.kt`: existing Vaadin screen configured on the root route (`/`).
+  - Organize application code under `paa/myfinanceregister/` by responsibility:
+    - `domain/`: domain models and repository definitions.
+    - `services/`: business logic and application services.
+    - `ui/`: Vaadin views and other user-interface code.
+  - Keep Vaadin-specific code in `ui/` and business logic in `services/`; do not place either in `domain/`.
 - `src/main/resources/`: application resources and configuration. `application.yml` configures the in-memory H2 datasource and JPA.
 - `src/main/frontend/`: Vaadin frontend resources. `generated/` contains automatically generated files; do not edit these files manually.
 - `src/test/kotlin/`: automated tests in Kotlin/JUnit. The existing test verifies Spring context loading.

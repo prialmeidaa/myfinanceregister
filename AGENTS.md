@@ -8,6 +8,8 @@ Consult the document in `.github/agents/code-standards.md` for style, architectu
 
 Also consult the [test.md](.github/agents/test.md) document.
 
+Every implementation must be accompanied by automated tests that cover the implemented behavior.
+
 ## Folder and file structure
 
 - `src/main/kotlin/`: Kotlin application code.

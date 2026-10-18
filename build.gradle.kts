@@ -6,7 +6,7 @@ plugins {
     id("com.vaadin") version "25.3.2"
 }
 
-group = "org.example"
+group = "myfinanceregister"
 version = "1.0-SNAPSHOT"
 
 repositories {

@@ -11,8 +11,8 @@ Also consult the [test.md](.github/agents/test.md) document.
 ## Folder and file structure
 
 - `src/main/kotlin/`: Kotlin application code.
-  - `org/example/MyFinanceRegisterApplication.kt`: Spring Boot entry point and main configuration.
-  - `org/example/MainView.kt`: Vaadin screen currently configured on the root route (`/`).
+  - `paa/myfinanceregister/MyFinanceRegisterApplication.kt`: Spring Boot entry point and main configuration.
+  - `paa/myfinanceregister/MainView.kt`: Vaadin screen currently configured on the root route (`/`).
 - `src/main/resources/`: application resources and configuration. `application.yml` configures the in-memory H2 datasource and JPA.
 - `src/main/frontend/`: Vaadin frontend resources. `generated/` contains automatically generated files; do not edit these files manually.
 - `src/test/kotlin/`: automated tests in Kotlin/JUnit. The existing test verifies Spring context loading.

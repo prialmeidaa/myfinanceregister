@@ -1,6 +1,6 @@
 # Project guide
 
-These instructions describe the structure and commands of this repository. Consult them at the start of each session and keep them updated when the structure or development flow changes.
+These instructions describe the structure and commands of this repository. Consult them at the start of each session.
 
 ## Code standards
 
@@ -12,28 +12,22 @@ Every implementation must be accompanied by automated tests that cover the imple
 
 ## Folder and file structure
 
-- `src/main/kotlin/`: Kotlin application code.
-  - `paa/myfinanceregister/MyFinanceRegisterApplication.kt`: Spring Boot entry point and main configuration.
-  - `paa/myfinanceregister/MainView.kt`: existing Vaadin screen configured on the root route (`/`).
-  - Organize application code under `paa/myfinanceregister/` by responsibility:
-    - `domain/`: domain models and repository definitions.
-    - `services/`: business logic and application services.
-    - `ui/`: Vaadin views and other user-interface code.
-  - Keep Vaadin-specific code in `ui/` and business logic in `services/`; do not place either in `domain/`.
-- `src/main/resources/`: application resources and configuration. `application.yml` configures the in-memory H2 datasource and JPA.
-- `src/main/frontend/`: Vaadin frontend resources. `generated/` contains automatically generated files; do not edit these files manually.
-- `src/test/kotlin/`: automated tests in Kotlin/JUnit. The existing test verifies Spring context loading.
-- `build.gradle.kts`: plugins, dependencies, versions, and Gradle task configuration. Current dependencies include Kotlin, Spring Boot, Vaadin, and H2.
-- `settings.gradle.kts`: project name and Gradle configuration.
-- `gradle.properties`: Gradle properties and Kotlin style settings.
-- `gradle/wrapper/`: Gradle Wrapper configuration and files; `gradle-wrapper.properties` pins the Gradle version.
-- `gradlew` and `gradlew.bat`: Wrapper scripts for Linux/macOS and Windows, respectively. Prefer them over a global Gradle installation.
-- `build/`, `target/`, `.gradle/`, and `.kotlin/`: generated outputs/cache; they are not source code and should not be edited manually.
-- `.idea/`: local IntelliJ IDEA settings.
+- `src/main/kotlin/paa/myfinanceregister/`: Kotlin application code, organized by responsibility:
+  - `domain/`: domain models and repository definitions.
+  - `services/`: business logic and application services.
+  - `ui/`: Vaadin views, reusable components, and layouts.
+  - `security/`: Spring Security and Vaadin security configuration.
+- `src/main/resources/`: application configuration and resources, including the Spring profiles and datasource settings.
+- `src/main/frontend/`: Vaadin frontend resources. Do not edit files under `generated/` manually.
+- `src/test/`: automated tests. Keep the test package and directory structure equivalent to the source file being tested.
+- `gradle/`, `gradlew`, and `gradlew.bat`: Gradle Wrapper configuration and scripts.
+- Root Gradle files (`build.gradle.kts`, `settings.gradle.kts`, and `gradle.properties`): build, dependency, project, and tool configuration.
+- `build/`, `target/`, `.gradle/`, and `.kotlin/`: generated outputs and caches; do not edit them manually.
 
 ## Requirements and dependencies
 
 - JDK 21, required by the Kotlin toolchain configured in `build.gradle.kts`.
+- `vaadin-dev` is available only for development and test runtime, not packaged in the production artifact.
 - There is no separate dependency installation step or maintained Node manager in this repository. The Gradle Wrapper downloads the configured Gradle distribution and resolves the dependencies declared in `build.gradle.kts` automatically when running tasks.
 - Run commands from the repository root. On Windows, use `./gradlew.bat`; on Linux/macOS, use `./gradlew`.
 

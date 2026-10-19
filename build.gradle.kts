@@ -18,10 +18,15 @@ dependencies {
     implementation(platform("com.vaadin:vaadin-bom:25.3.2"))
     implementation("com.vaadin:vaadin-spring-boot-starter:25.3.2")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     developmentOnly("com.vaadin:vaadin-dev")
     runtimeOnly("com.h2database:h2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation("org.springframework.security:spring-security-test")
+    testRuntimeOnly("com.vaadin:vaadin-dev")
 }
 
 kotlin {

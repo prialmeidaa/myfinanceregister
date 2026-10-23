@@ -8,8 +8,9 @@ import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
 import com.vaadin.flow.server.auth.AnonymousAllowed
 import org.springframework.core.env.Environment
+import paa.myfinanceregister.ui.layout.MainLayout
 
-@Route("login")
+@Route(value = "login", layout = MainLayout::class)
 @PageTitle("Login")
 @AnonymousAllowed
 class LoginView(private val environment: Environment) : VerticalLayout() {

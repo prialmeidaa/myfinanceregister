@@ -1,26 +1,22 @@
 package paa.myfinanceregister.ui.views
 
-import com.vaadin.flow.component.html.Anchor
-import com.vaadin.flow.component.html.Nav
+import com.vaadin.flow.component.html.Paragraph
 import com.vaadin.flow.router.Route
 import jakarta.annotation.security.PermitAll
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import paa.myfinanceregister.ui.layout.MainLayout
 
 class MainViewTests {
     @Test
-    fun mainViewRemainsConfiguredOnRootRoute() {
+    fun mainViewUsesSharedLayoutAndShowsTodo() {
         val mainView = MainView()
         val route = MainView::class.java.getAnnotation(Route::class.java)
+        val todo = mainView.children.toList().filterIsInstance<Paragraph>().single()
 
         assertThat(route.value).isEmpty()
+        assertThat(route.layout.java).isEqualTo(MainLayout::class.java)
         assertThat(MainView::class.java.isAnnotationPresent(PermitAll::class.java)).isTrue()
-        val navigation = mainView.children.toList().filterIsInstance<Nav>().single()
-        val links = navigation.children.toList()
-            .flatMap { it.children.toList() }
-            .filterIsInstance<Anchor>()
-
-        assertThat(links.map { it.text }).containsExactly("Home", "Accounts", "Statement")
-        assertThat(links.map { it.href }).containsExactly("/", "/accounts", "/statement")
+        assertThat(todo.text).isEqualTo("TODO: Home")
     }
 }

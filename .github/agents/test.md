@@ -8,5 +8,6 @@
   - **Self-validating:** each test must explicitly verify the expected results and behaviors with good *assertions*/*expects*. Line coverage alone does not prove that the behavior is correct.
   - **Timely:** write the tests before or alongside the implementation, following **Test-First**. Organize test creation in the order that makes the most sense to get efficient feedback.
 - Structure each test as **Given/When/Then**: prepare the context, execute the action, and verify the result.
+- Create a separate test file and test class for each Kotlin source file being tested. Keep each test class focused on a single production Kotlin file instead of combining tests for multiple files in one class.
 - Follow the test pyramid: keep a broad base of unit tests, complemented by integration tests and a smaller number of end-to-end (E2E) tests.
 - Each test method should focus on a single concept or behavior. Do not mix checks for different behaviors in the same test.

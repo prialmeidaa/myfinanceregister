@@ -17,6 +17,9 @@ class SecurityDevelopmentConfiguration {
     @Bean
     fun vaadinSecurityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http.formLogin(Customizer.withDefaults())
+        http.authorizeHttpRequests { requests ->
+            requests.requestMatchers("/images/**").permitAll()
+        }
         http.with(VaadinSecurityConfigurer.vaadin()) { vaadin ->
             vaadin.loginView(LoginView::class.java)
         }

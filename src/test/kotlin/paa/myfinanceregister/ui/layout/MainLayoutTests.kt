@@ -3,6 +3,8 @@ package paa.myfinanceregister.ui.layout
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.applayout.DrawerToggle
 import com.vaadin.flow.component.html.H1
+import com.vaadin.flow.component.html.Hr
+import com.vaadin.flow.component.html.Image
 import com.vaadin.flow.server.auth.AnonymousAllowed
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -16,7 +18,13 @@ class MainLayoutTests {
 
         assertThat(components.filterIsInstance<DrawerToggle>()).hasSize(1)
         assertThat(components.filterIsInstance<H1>().map { it.text })
-            .containsOnly("My Finance Register")
+            .containsExactly("My Finance Register")
+        assertThat(components.filterIsInstance<Image>().map { it.src })
+            .containsExactly("/images/logo-192x192.png")
+        assertThat(components.filterIsInstance<Hr>())
+            .singleElement()
+            .extracting { it.element.style.get("margin-inline") }
+            .isEqualTo("var(--lumo-space-m)")
         assertThat(components.filterIsInstance<MainMenu>()).hasSize(1)
         assertThat(MainLayout::class.java.isAnnotationPresent(AnonymousAllowed::class.java)).isTrue()
     }

@@ -21,6 +21,11 @@ class MainLayoutTests {
             .containsExactly("My Finance Register")
         assertThat(components.filterIsInstance<Image>().map { it.src })
             .containsExactly("/images/logo-192x192.png")
+        val logo = components.filterIsInstance<Image>().single()
+        assertThat(logo.width).isEqualTo("100px")
+        assertThat(logo.height).isEqualTo("100px")
+        assertThat(logo.element.style.get("display")).isEqualTo("block")
+        assertThat(logo.element.style.get("margin")).isEqualTo("0 auto")
         assertThat(components.filterIsInstance<Hr>())
             .singleElement()
             .extracting { it.element.style.get("margin-inline") }

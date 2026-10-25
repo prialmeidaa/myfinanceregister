@@ -22,7 +22,12 @@ class MainLayout : AppLayout(), BeforeEnterObserver {
     init {
         addToNavbar(DrawerToggle(), pageTitle)
         addToDrawer(
-            Image("/images/logo-192x192.png", DEFAULT_NAVBAR_TITLE),
+            Image("/images/logo-192x192.png", DEFAULT_NAVBAR_TITLE).apply {
+                setWidth("100px")
+                setHeight("100px")
+                style.set("display", "block")
+                style.set("margin", "0 auto")
+            },
             Hr().apply { style.set("margin-inline", "var(--lumo-space-m)") },
             Scroller(MainMenu())
         )

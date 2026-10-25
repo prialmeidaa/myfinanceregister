@@ -16,6 +16,7 @@ repositories {
 dependencies {
     implementation(platform("org.springframework.boot:spring-boot-dependencies:4.1.1"))
     implementation(platform("com.vaadin:vaadin-bom:25.3.2"))
+    implementation(kotlin("reflect"))
     implementation("com.vaadin:vaadin-spring-boot-starter:25.3.2")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-security")

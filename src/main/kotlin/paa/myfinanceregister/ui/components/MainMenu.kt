@@ -9,6 +9,7 @@ class MainMenu : SideNav() {
         addItem(
             SideNavItem("Home", "/", VaadinIcon.HOME.create()),
             SideNavItem("Accounts", "/accounts", VaadinIcon.BUILDING.create()),
+            SideNavItem("Categories", "/categories", VaadinIcon.TAGS.create()),
             SideNavItem("Statement", "/statement", VaadinIcon.LIST.create())
         )
     }

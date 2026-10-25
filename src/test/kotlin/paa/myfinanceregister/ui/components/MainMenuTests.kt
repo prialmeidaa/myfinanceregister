@@ -10,7 +10,7 @@ class MainMenuTests {
         val menu = MainMenu()
         val items = menu.children.toList().filterIsInstance<SideNavItem>()
 
-        assertThat(items.map { it.label }).containsExactly("Home", "Accounts", "Statement")
-        assertThat(items.map { it.path }).containsExactly("", "accounts", "statement")
+        assertThat(items.map { it.label }).containsExactly("Home", "Accounts", "Categories", "Statement")
+        assertThat(items.map { it.path }).containsExactly("", "accounts", "categories", "statement")
     }
 }

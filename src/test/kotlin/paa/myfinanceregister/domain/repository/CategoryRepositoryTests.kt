@@ -21,6 +21,6 @@ class CategoryRepositoryTests @Autowired constructor(
 
         assertThat(categories.map { it.description }).containsExactly("Expenses", "Food")
         assertThat(categories.last().rootCategory?.id).isEqualTo(root.id)
-        assertThat(repository.existsByRootCategory_Id(requireNotNull(root.id))).isTrue()
+        assertThat(repository.existsByRootCategoryId(requireNotNull(root.id))).isTrue()
     }
 }

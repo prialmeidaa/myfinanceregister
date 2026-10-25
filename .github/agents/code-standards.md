@@ -250,7 +250,7 @@ fun applyDiscount(value: Double): Double {
 
 ## 9) Always use camelCase for methods and variables
 
-All method, parameter, and variable names must follow the `camelCase` pattern.
+All method, parameter, and variable names must follow the `camelCase` pattern. Method names must not contain underscores.
 
 Correct example:
 
@@ -272,6 +272,14 @@ fun CalculateInterest(value: Double): Double {
 }
 ```
 
+Not recommended example:
+
+```kotlin
+fun findByRootCategory_Id(rootCategoryId: Long): Boolean {
+    return false
+}
+```
+
 ## Practical summary
 
 - Short, readable, and focused code.
@@ -280,7 +288,7 @@ fun CalculateInterest(value: Double): Double {
 - Avoid excessive branching and nested validations.
 - Use constants for fixed values.
 - Use DTOs for complex parameters.
-- Keep names consistent and in `camelCase`.
+- Keep names consistent and in `camelCase`; never use underscores in method names.
 - Do not comment code unless there is a real need.
 
 ## Validation flow

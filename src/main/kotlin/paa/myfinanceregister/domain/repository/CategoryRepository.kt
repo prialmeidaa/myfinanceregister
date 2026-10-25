@@ -8,5 +8,5 @@ interface CategoryRepository : JpaRepository<Category, Long> {
     @EntityGraph(attributePaths = ["rootCategory"])
     fun findAllByOrderByDescriptionAsc(): List<Category>
 
-    fun existsByRootCategory_Id(rootCategoryId: Long): Boolean
+    fun existsByRootCategoryId(rootCategoryId: Long): Boolean
 }

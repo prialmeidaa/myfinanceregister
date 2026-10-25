@@ -27,7 +27,7 @@ class CategoryService(private val repository: CategoryRepository) {
     @Transactional
     fun delete(id: Long) {
         val category = loadCategory(id)
-        check(!repository.existsByRootCategory_Id(id)) {
+        check(!repository.existsByRootCategoryId(id)) {
             "Cannot delete a category that has subcategories"
         }
         repository.delete(category)

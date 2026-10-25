@@ -63,7 +63,7 @@ class CategoryServiceTests {
     @Test
     fun deleteRejectsCategoryWithSubcategories() {
         Mockito.`when`(repository.findById(1L)).thenReturn(Optional.of(Category(1L, "Expenses")))
-        Mockito.`when`(repository.existsByRootCategory_Id(1L)).thenReturn(true)
+        Mockito.`when`(repository.existsByRootCategoryId(1L)).thenReturn(true)
 
         assertThatThrownBy { service.delete(1L) }
             .isInstanceOf(IllegalStateException::class.java)

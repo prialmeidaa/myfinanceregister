@@ -13,7 +13,8 @@ Every implementation must be accompanied by automated tests that cover the imple
 ## Folder and file structure
 
 - `src/main/kotlin/paa/myfinanceregister/`: Kotlin application code, organized by responsibility:
-  - `domain/`: domain models and repository definitions.
+  - `domain/model/`: domain entities and models.
+  - `domain/repository/`: persistence repositories.
   - `services/`: business logic and application services.
   - `ui/`: Vaadin views, reusable components, and layouts.
   - `security/`: Spring Security and Vaadin security configuration.

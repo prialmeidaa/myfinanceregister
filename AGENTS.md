@@ -10,6 +10,11 @@ Also consult the [test.md](.github/agents/test.md) document.
 
 Every implementation must be accompanied by automated tests that cover the implemented behavior.
 
+## File tracking
+
+- Whenever you create a new file, stage it with `git add`.
+- If the change that introduced a new file is not accepted, remove that file from the working tree and unstage it if necessary.
+
 ## Folder and file structure
 
 - `src/main/kotlin/paa/myfinanceregister/`: Kotlin application code, organized by responsibility:

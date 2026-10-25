@@ -29,6 +29,15 @@ class MainLayoutTests {
         assertThat(MainLayout::class.java.isAnnotationPresent(AnonymousAllowed::class.java)).isTrue()
     }
 
+    @Test
+    fun mainLayoutUpdatesNavbarTitleWhenPageTitleChanges() {
+        val layout = MainLayout()
+
+        layout.updateCurrentPageTitle("Accounts")
+
+        assertThat(descendants(layout).filterIsInstance<H1>().single().text).isEqualTo("Accounts")
+    }
+
     private fun descendants(component: Component): List<Component> =
         listOf(component) + component.children.toList().flatMap(::descendants)
 }

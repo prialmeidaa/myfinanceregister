@@ -62,4 +62,17 @@ class AccountServiceTests {
         Mockito.verify(repository).save(account)
         Mockito.verify(repository, Mockito.never()).delete(Mockito.any(Account::class.java))
     }
+
+    @Test
+    fun activatePersistsActiveAccountWithoutCreatingAnotherAccount() {
+        val account = Account(1, "Checking", active = false)
+        Mockito.`when`(repository.findById(1)).thenReturn(Optional.of(account))
+        Mockito.`when`(repository.save(account)).thenReturn(account)
+
+        val activated = service.activate(1)
+
+        assertThat(activated.active).isTrue()
+        Mockito.verify(repository).save(account)
+        Mockito.verify(repository, Mockito.never()).delete(Mockito.any(Account::class.java))
+    }
 }

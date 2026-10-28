@@ -27,6 +27,13 @@ class AccountService(private val repository: AccountRepository) {
         return repository.save(account)
     }
 
+    @Transactional
+    fun activate(id: Long): Account {
+        val account = loadAccount(id)
+        account.active = true
+        return repository.save(account)
+    }
+
     private fun loadAccount(id: Long): Account =
         repository.findById(id).orElseThrow { NoSuchElementException("Account $id not found") }
 }

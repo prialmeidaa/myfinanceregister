@@ -37,10 +37,13 @@ class AccountsView(private val service: AccountService) : VerticalLayout() {
 
     private fun createActions(account: Account): Component = HorizontalLayout(
         Button("Edit") { openForm(account) },
-        Button("Deactivate") { confirmDeactivation(account) }.apply {
-            isEnabled = account.active
-        }
+        accountStatusButton(account)
     )
+
+    private fun accountStatusButton(account: Account): Button {
+        if (account.active) return Button("Deactivate") { confirmDeactivation(account) }
+        return Button("Activate") { activateAccount(account) }
+    }
 
     private fun openForm(account: Account? = null) {
         AccountFormDialog(account, ::saveAccount).open()
@@ -80,7 +83,25 @@ class AccountsView(private val service: AccountService) : VerticalLayout() {
         try {
             service.deactivate(requireNotNull(account.id))
             refreshGrid()
-            Notification.show("Account deactivated")
+            Notification.show(
+                "Account deactivated",
+                SUCCESS_NOTIFICATION_DURATION,
+                Notification.Position.TOP_CENTER
+            )
+        } catch (exception: NoSuchElementException) {
+            Notification.show(exception.message ?: "Account not found")
+        }
+    }
+
+    internal fun activateAccount(account: Account) {
+        try {
+            service.activate(requireNotNull(account.id))
+            refreshGrid()
+            Notification.show(
+                "Account activated",
+                SUCCESS_NOTIFICATION_DURATION,
+                Notification.Position.TOP_CENTER
+            )
         } catch (exception: NoSuchElementException) {
             Notification.show(exception.message ?: "Account not found")
         }
@@ -88,5 +109,9 @@ class AccountsView(private val service: AccountService) : VerticalLayout() {
 
     private fun refreshGrid() {
         grid.setItems(service.findAll())
+    }
+
+    private companion object {
+        const val SUCCESS_NOTIFICATION_DURATION = 5000
     }
 }

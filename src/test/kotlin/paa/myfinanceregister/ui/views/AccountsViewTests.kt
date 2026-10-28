@@ -42,7 +42,35 @@ class AccountsViewTests {
 
             Mockito.verify(service).deactivate(1)
             Mockito.verify(service, Mockito.times(2)).findAll()
-            notifications.verify { Notification.show("Account deactivated") }
+            notifications.verify {
+                Notification.show(
+                    "Account deactivated",
+                    5000,
+                    Notification.Position.TOP_CENTER
+                )
+            }
+        }
+    }
+
+    @Test
+    fun activationUpdatesAccountAndRefreshesTheGrid() {
+        val service = Mockito.mock(AccountService::class.java)
+        val account = Account(1, "Checking", active = false)
+        Mockito.`when`(service.findAll()).thenReturn(listOf(account))
+        val view = AccountsView(service)
+
+        Mockito.mockStatic(Notification::class.java).use { notifications ->
+            view.activateAccount(account)
+
+            Mockito.verify(service).activate(1)
+            Mockito.verify(service, Mockito.times(2)).findAll()
+            notifications.verify {
+                Notification.show(
+                    "Account activated",
+                    5000,
+                    Notification.Position.TOP_CENTER
+                )
+            }
         }
     }
 }

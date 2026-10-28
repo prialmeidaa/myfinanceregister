@@ -5,7 +5,6 @@ import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.treegrid.TreeGrid
 import com.vaadin.flow.component.html.Paragraph
-import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.PageTitle
@@ -13,6 +12,7 @@ import com.vaadin.flow.router.Route
 import jakarta.annotation.security.PermitAll
 import paa.myfinanceregister.domain.model.Category
 import paa.myfinanceregister.services.CategoryService
+import paa.myfinanceregister.ui.components.AppNotification
 import paa.myfinanceregister.ui.components.CategoryFormDialog
 import paa.myfinanceregister.ui.layout.MainLayout
 
@@ -48,13 +48,13 @@ class CategoriesView(private val service: CategoryService) : VerticalLayout() {
         return try {
             service.save(id, description, rootId)
             refreshGrid()
-            Notification.show("Category saved")
+            AppNotification.show("Category saved")
             true
         } catch (exception: IllegalArgumentException) {
-            Notification.show(exception.message ?: "Invalid category")
+            AppNotification.show(exception.message ?: "Invalid category")
             false
         } catch (exception: NoSuchElementException) {
-            Notification.show(exception.message ?: "Category not found")
+            AppNotification.show(exception.message ?: "Category not found")
             false
         }
     }
@@ -78,15 +78,13 @@ class CategoriesView(private val service: CategoryService) : VerticalLayout() {
         try {
             service.delete(requireNotNull(category.id))
             refreshGrid()
-            Notification.show("Category deleted")
+            AppNotification.show("Category deleted")
         } catch (exception: IllegalStateException) {
-            Notification.show(
-                exception.message ?: "Category cannot be deleted",
-                DELETE_ERROR_DURATION,
-                Notification.Position.MIDDLE
+            AppNotification.show(
+                exception.message ?: "Category cannot be deleted"
             )
         } catch (exception: NoSuchElementException) {
-            Notification.show(exception.message ?: "Category not found")
+            AppNotification.show(exception.message ?: "Category not found")
         }
     }
 
@@ -96,9 +94,5 @@ class CategoriesView(private val service: CategoryService) : VerticalLayout() {
         val roots = categories.filter { it.rootCategory == null }
         grid.setItems(roots) { category -> childrenByRoot[category].orEmpty() }
         grid.expandRecursively(roots, categories.size)
-    }
-
-    private companion object {
-        const val DELETE_ERROR_DURATION = 5000
     }
 }

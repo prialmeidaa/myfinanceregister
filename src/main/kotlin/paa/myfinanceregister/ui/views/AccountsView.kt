@@ -5,7 +5,6 @@ import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.html.Paragraph
-import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.PageTitle
@@ -13,6 +12,7 @@ import com.vaadin.flow.router.Route
 import jakarta.annotation.security.PermitAll
 import paa.myfinanceregister.domain.model.Account
 import paa.myfinanceregister.services.AccountService
+import paa.myfinanceregister.ui.components.AppNotification
 import paa.myfinanceregister.ui.components.AccountFormDialog
 import paa.myfinanceregister.ui.layout.MainLayout
 
@@ -53,13 +53,13 @@ class AccountsView(private val service: AccountService) : VerticalLayout() {
         return try {
             service.save(id, description)
             refreshGrid()
-            Notification.show("Account saved")
+            AppNotification.show("Account saved")
             true
         } catch (exception: IllegalArgumentException) {
-            Notification.show(exception.message ?: "Invalid account")
+            AppNotification.show(exception.message ?: "Invalid account")
             false
         } catch (exception: NoSuchElementException) {
-            Notification.show(exception.message ?: "Account not found")
+            AppNotification.show(exception.message ?: "Account not found")
             false
         }
     }
@@ -83,13 +83,9 @@ class AccountsView(private val service: AccountService) : VerticalLayout() {
         try {
             service.deactivate(requireNotNull(account.id))
             refreshGrid()
-            Notification.show(
-                "Account deactivated",
-                SUCCESS_NOTIFICATION_DURATION,
-                Notification.Position.TOP_CENTER
-            )
+            AppNotification.show("Account deactivated")
         } catch (exception: NoSuchElementException) {
-            Notification.show(exception.message ?: "Account not found")
+            AppNotification.show(exception.message ?: "Account not found")
         }
     }
 
@@ -97,21 +93,13 @@ class AccountsView(private val service: AccountService) : VerticalLayout() {
         try {
             service.activate(requireNotNull(account.id))
             refreshGrid()
-            Notification.show(
-                "Account activated",
-                SUCCESS_NOTIFICATION_DURATION,
-                Notification.Position.TOP_CENTER
-            )
+            AppNotification.show("Account activated")
         } catch (exception: NoSuchElementException) {
-            Notification.show(exception.message ?: "Account not found")
+            AppNotification.show(exception.message ?: "Account not found")
         }
     }
 
     private fun refreshGrid() {
         grid.setItems(service.findAll())
-    }
-
-    private companion object {
-        const val SUCCESS_NOTIFICATION_DURATION = 5000
     }
 }

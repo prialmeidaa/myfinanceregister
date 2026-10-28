@@ -48,7 +48,7 @@ class CategoriesViewTests {
                 Notification.show(
                     "Cannot delete a category that has subcategories",
                     5000,
-                    Notification.Position.MIDDLE
+                    Notification.Position.TOP_CENTER
                 )
             }
         }

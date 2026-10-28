@@ -280,6 +280,12 @@ fun findByRootCategory_Id(rootCategoryId: Long): Boolean {
 }
 ```
 
+## 10) UI patterns
+
+- Use `AppNotification` from `ui/components` whenever creating or displaying a notification.
+- Do not call Vaadin's `Notification.show` directly from views or other UI code; `AppNotification` applies the shared top-center position and default duration.
+- Pass a duration to `AppNotification.show` only when the notification needs a duration other than the shared default.
+
 ## Practical summary
 
 - Short, readable, and focused code.
@@ -289,6 +295,7 @@ fun findByRootCategory_Id(rootCategoryId: Long): Boolean {
 - Use constants for fixed values.
 - Use DTOs for complex parameters.
 - Keep names consistent and in `camelCase`; never use underscores in method names.
+- Use `AppNotification` for notifications so they appear at the top center of the screen.
 - Do not comment code unless there is a real need.
 
 ## Validation flow

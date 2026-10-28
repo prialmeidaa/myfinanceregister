@@ -34,11 +34,11 @@ class CategoriesViewTests {
     }
 
     @Test
-    fun failedCategoryDeletionShowsNotificationInPageCenter() {
+    fun deletingCategoryUsedByStatementsShowsNotificationInPageCenter() {
         val service = Mockito.mock(CategoryService::class.java)
         val category = Category(id = 1, description = "Root")
         val view = CategoriesView(service)
-        Mockito.doThrow(IllegalStateException("Cannot delete a category that has subcategories"))
+        Mockito.doThrow(IllegalStateException("Cannot delete a category that is used by statements"))
             .`when`(service).delete(1)
 
         Mockito.mockStatic(Notification::class.java).use { notifications ->
@@ -46,7 +46,7 @@ class CategoriesViewTests {
 
             notifications.verify {
                 Notification.show(
-                    "Cannot delete a category that has subcategories",
+                    "Cannot delete a category that is used by statements",
                     5000,
                     Notification.Position.TOP_CENTER
                 )

@@ -7,4 +7,6 @@ import paa.myfinanceregister.domain.model.Statement
 interface StatementRepository : JpaRepository<Statement, Long> {
     @EntityGraph(attributePaths = ["category", "account"])
     fun findAllByOrderByDateDesc(): List<Statement>
+
+    fun existsByCategoryId(categoryId: Long): Boolean
 }

@@ -4,9 +4,13 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import paa.myfinanceregister.domain.model.Category
 import paa.myfinanceregister.domain.repository.CategoryRepository
+import paa.myfinanceregister.domain.repository.StatementRepository
 
 @Service
-class CategoryService(private val repository: CategoryRepository) {
+class CategoryService(
+    private val repository: CategoryRepository,
+    private val statementRepository: StatementRepository
+) {
     @Transactional(readOnly = true)
     fun findAll(): List<Category> = repository.findAllByOrderByDescriptionAsc()
 
@@ -27,6 +31,9 @@ class CategoryService(private val repository: CategoryRepository) {
     @Transactional
     fun delete(id: Long) {
         val category = loadCategory(id)
+        check(!statementRepository.existsByCategoryId(id)) {
+            "Cannot delete a category that is used by statements"
+        }
         check(!repository.existsByRootCategoryId(id)) {
             "Cannot delete a category that has subcategories"
         }

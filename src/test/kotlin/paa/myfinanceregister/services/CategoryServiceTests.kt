@@ -6,11 +6,13 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import paa.myfinanceregister.domain.model.Category
 import paa.myfinanceregister.domain.repository.CategoryRepository
+import paa.myfinanceregister.domain.repository.StatementRepository
 import java.util.Optional
 
 class CategoryServiceTests {
     private val repository = Mockito.mock(CategoryRepository::class.java)
-    private val service = CategoryService(repository)
+    private val statementRepository = Mockito.mock(StatementRepository::class.java)
+    private val service = CategoryService(repository, statementRepository)
 
     @Test
     fun findAllReturnsCategoriesInRepositoryOrder() {
@@ -67,6 +69,18 @@ class CategoryServiceTests {
 
         assertThatThrownBy { service.delete(1L) }
             .isInstanceOf(IllegalStateException::class.java)
+
+        Mockito.verify(repository, Mockito.never()).delete(Mockito.any(Category::class.java))
+    }
+
+    @Test
+    fun deleteRejectsCategoryUsedByStatements() {
+        Mockito.`when`(repository.findById(1L)).thenReturn(Optional.of(Category(1L, "Food")))
+        Mockito.`when`(statementRepository.existsByCategoryId(1L)).thenReturn(true)
+
+        assertThatThrownBy { service.delete(1L) }
+            .isInstanceOf(IllegalStateException::class.java)
+            .hasMessage("Cannot delete a category that is used by statements")
 
         Mockito.verify(repository, Mockito.never()).delete(Mockito.any(Category::class.java))
     }

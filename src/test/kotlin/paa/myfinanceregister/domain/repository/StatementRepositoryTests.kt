@@ -36,6 +36,17 @@ class StatementRepositoryTests @Autowired constructor(
         assertThat(statements.first().amount).isEqualByComparingTo("30.00")
     }
 
+    @Test
+    fun detectsWhetherCategoryIsUsedByAStatement() {
+        val category = categoryRepository.save(Category(description = "Food"))
+        val unusedCategory = categoryRepository.save(Category(description = "Housing"))
+        val account = accountRepository.save(Account(description = "Checking"))
+        repository.save(createStatement(LocalDate.of(2026, 9, 1), category, account, "12.00"))
+
+        assertThat(repository.existsByCategoryId(requireNotNull(category.id))).isTrue()
+        assertThat(repository.existsByCategoryId(requireNotNull(unusedCategory.id))).isFalse()
+    }
+
     private fun createStatement(
         date: LocalDate,
         category: Category,

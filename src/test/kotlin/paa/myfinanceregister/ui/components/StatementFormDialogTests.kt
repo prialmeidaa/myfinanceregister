@@ -17,6 +17,22 @@ import java.time.LocalDate
 
 class StatementFormDialogTests {
     @Test
+    fun newDialogOnlyShowsActiveAccounts() {
+        val activeAccount = Account(1, "Checking")
+        val inactiveAccount = Account(2, "Old account", active = false)
+        val dialog = StatementFormDialog(
+            listOf(Category(1, "Food")),
+            listOf(activeAccount, inactiveAccount),
+            null
+        ) { _, _ -> false }
+        val accountField = descendants(dialog)
+            .filterIsInstance<ComboBox<Account>>()
+            .single { it.label == "Account" }
+
+        assertThat(accountField.listDataView.items.toList()).containsExactly(activeAccount)
+    }
+
+    @Test
     fun editDialogSelectsRelatedItemsByTheirIds() {
         val selectedCategory = Category(1, "Food")
         val selectedAccount = Account(2, "Checking")

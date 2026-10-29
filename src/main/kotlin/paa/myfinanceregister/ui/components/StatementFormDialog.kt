@@ -36,7 +36,7 @@ class StatementFormDialog(
     private val accountField = ComboBox<Account>("Account").apply {
         isRequired = true
         setItemLabelGenerator { it.description }
-        setItems(accounts)
+        setItems(if (statement == null) accounts.filter { it.active } else accounts)
         value = accounts.firstOrNull { it.id == statement?.account?.id }
     }
     private val amountField = BigDecimalField("Amount").apply {

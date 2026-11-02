@@ -44,7 +44,7 @@ class StatementViewTests {
         assertThat(cssImport.themeFor).isEmpty()
         assertThat(StatementView::class.java.isAnnotationPresent(PermitAll::class.java)).isTrue()
         assertThat(grid.dataProvider.fetch(Query()).toList().mapNotNull { it.statement })
-            .containsExactlyElementsOf(statements)
+            .containsExactlyElementsOf(statements.reversed())
     }
 
     @Test
@@ -65,15 +65,15 @@ class StatementViewTests {
         val grid = view.children.toList().filterIsInstance<Grid<StatementGridRow>>().single()
 
         assertThat(grid.dataProvider.fetch(Query()).toList().mapNotNull { it.statement })
-            .containsExactly(statements[0], statements[2])
+            .containsExactly(statements[2], statements[0])
         assertThat(grid.dataProvider.fetch(Query()).toList()
             .filter { it.totalType == StatementTotalType.MONTHLY }
             .map { it.amount })
-            .containsExactly(BigDecimal("30.00"), BigDecimal("-5.00"))
+            .containsExactly(BigDecimal("-5.00"), BigDecimal("30.00"))
         assertThat(grid.dataProvider.fetch(Query()).toList()
             .filter { it.totalType == StatementTotalType.DAILY }
             .map { it.amount })
-            .containsExactly(BigDecimal("25.00"), BigDecimal("-5.00"))
+            .containsExactly(BigDecimal("-5.00"), BigDecimal("25.00"))
     }
 
     @Test
@@ -100,7 +100,7 @@ class StatementViewTests {
         }
         val dailyTotals = totalRows.filter { it.totalType == StatementTotalType.DAILY }
         assertThat(dailyTotals.map { it.amount })
-            .containsExactly(BigDecimal("85.00"), BigDecimal("75.00"))
+            .containsExactly(BigDecimal("75.00"), BigDecimal("85.00"))
         assertThat(totalRows.single { it.totalType == StatementTotalType.MONTHLY }.amount)
             .isEqualByComparingTo("85.00")
     }

@@ -36,7 +36,7 @@ object StatementGridRowFactory {
     fun create(statements: List<Statement>): List<StatementGridRow> {
         val runningTotals = runningTotalsByDate(statements)
         return statements.groupBy { YearMonth.from(it.date) }
-            .toSortedMap(reverseOrder())
+            .toSortedMap()
             .values
             .flatMap { monthStatements -> rowsForMonth(monthStatements, runningTotals) }
     }
@@ -47,7 +47,7 @@ object StatementGridRowFactory {
     ): List<StatementGridRow> =
         buildList {
             val statementsByDate = statements.groupBy { it.date }
-            statementsByDate.toSortedMap(reverseOrder()).forEach { (date, dayStatements) ->
+            statementsByDate.toSortedMap().forEach { (date, dayStatements) ->
                 dayStatements.forEach { add(it.toGridRow()) }
                 add(
                     StatementGridRow(

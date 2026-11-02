@@ -1,0 +1,23 @@
+vaadin-grid::part(statement-total) {
+  background-color: var(--vaadin-background-container);
+  color: var(--vaadin-text-color-secondary);
+  font-weight: var(--aura-font-weight-semibold);
+}
+
+vaadin-grid::part(statement-month-total) {
+  background-color: var(--vaadin-background-container-strong);
+  color: var(--vaadin-text-color);
+  font-weight: var(--aura-font-weight-semibold);
+}
+
+vaadin-grid::part(statement-amount-positive) {
+  color: var(--aura-blue-text);
+}
+
+vaadin-grid::part(statement-amount-negative) {
+  color: var(--aura-red-text);
+}
+
+vaadin-grid::part(statement-amount-neutral) {
+  color: var(--vaadin-text-color-secondary);
+}

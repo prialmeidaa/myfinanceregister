@@ -1,6 +1,7 @@
 package paa.myfinanceregister.ui.views
 
 import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.dependency.CssImport
 import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.data.provider.Query
 import com.vaadin.flow.router.PageTitle
@@ -33,11 +34,14 @@ class StatementViewTests {
         val view = createView(service)
         val route = StatementView::class.java.getAnnotation(Route::class.java)
         val title = StatementView::class.java.getAnnotation(PageTitle::class.java)
+        val cssImport = StatementView::class.java.getAnnotation(CssImport::class.java)
         val grid = view.children.toList().filterIsInstance<Grid<StatementGridRow>>().single()
 
         assertThat(route.value).isEqualTo("statement")
         assertThat(route.layout.java).isEqualTo(MainLayout::class.java)
         assertThat(title.value).isEqualTo("Statement")
+        assertThat(cssImport.value).isEqualTo("./styles/statement-view.css")
+        assertThat(cssImport.themeFor).isEmpty()
         assertThat(StatementView::class.java.isAnnotationPresent(PermitAll::class.java)).isTrue()
         assertThat(grid.dataProvider.fetch(Query()).toList().mapNotNull { it.statement })
             .containsExactlyElementsOf(statements)
@@ -46,9 +50,9 @@ class StatementViewTests {
     @Test
     fun selectingMultipleMonthsFiltersStatementsToThoseMonths() {
         val statements = listOf(
-            statement(LocalDate.of(2026, 10, 5), "October"),
-            statement(LocalDate.of(2026, 9, 5), "September"),
-            statement(LocalDate.of(2026, 8, 5), "August")
+            statement(LocalDate.of(2026, 10, 5), "October", "30.00"),
+            statement(LocalDate.of(2026, 9, 5), "September", "200.00"),
+            statement(LocalDate.of(2026, 8, 5), "August", "-5.00")
         )
         val service = Mockito.mock(StatementService::class.java)
         Mockito.`when`(service.findAll()).thenReturn(statements)
@@ -62,6 +66,14 @@ class StatementViewTests {
 
         assertThat(grid.dataProvider.fetch(Query()).toList().mapNotNull { it.statement })
             .containsExactly(statements[0], statements[2])
+        assertThat(grid.dataProvider.fetch(Query()).toList()
+            .filter { it.totalType == StatementTotalType.MONTHLY }
+            .map { it.amount })
+            .containsExactly(BigDecimal("30.00"), BigDecimal("-5.00"))
+        assertThat(grid.dataProvider.fetch(Query()).toList()
+            .filter { it.totalType == StatementTotalType.DAILY }
+            .map { it.amount })
+            .containsExactly(BigDecimal("25.00"), BigDecimal("-5.00"))
     }
 
     @Test
@@ -78,9 +90,18 @@ class StatementViewTests {
             .single()
         val rows = grid.dataProvider.fetch(Query()).toList()
 
-        assertThat(rows.filter { it.description == "Daily total" }.map { it.amount })
-            .containsExactly(BigDecimal("10.00"), BigDecimal("75.00"))
-        assertThat(rows.single { it.description == "Monthly total" }.amount)
+        val totalRows = rows.filter { it.totalType != null }
+        assertThat(totalRows).hasSize(3)
+        assertThat(totalRows).allSatisfy {
+            assertThat(it.date).isEmpty()
+            assertThat(it.description).isEmpty()
+            assertThat(it.category).isEmpty()
+            assertThat(it.account).isEmpty()
+        }
+        val dailyTotals = totalRows.filter { it.totalType == StatementTotalType.DAILY }
+        assertThat(dailyTotals.map { it.amount })
+            .containsExactly(BigDecimal("85.00"), BigDecimal("75.00"))
+        assertThat(totalRows.single { it.totalType == StatementTotalType.MONTHLY }.amount)
             .isEqualByComparingTo("85.00")
     }
 
@@ -90,8 +111,25 @@ class StatementViewTests {
         val rows = StatementGridRowFactory.create(listOf(statement))
 
         assertThat(rows.first().date).isEqualTo("05/10/2026")
-        assertThat(rows.first { it.description == "Daily total" }.date).isEqualTo("05/10/2026")
+        assertThat(rows[1].date).isEmpty()
+        assertThat(rows[1].description).isEmpty()
         assertThat(StatementGridRowFactory.formatAmount(rows.first().amount)).isEqualTo("1.234,50")
+    }
+
+    @Test
+    fun assignsGridCellPartsForTotalsAndAmountSigns() {
+        val row = StatementGridRow(
+            "", "", "", "", BigDecimal("10.00"), totalType = StatementTotalType.DAILY
+        )
+
+        assertThat(StatementGridStyling.amountCellParts(row))
+            .isEqualTo("statement-total statement-amount-positive")
+        assertThat(StatementGridStyling.amountCellParts(row.copy(amount = BigDecimal("-5.00"))))
+            .isEqualTo("statement-total statement-amount-negative")
+        assertThat(
+            StatementGridStyling.amountCellParts(row.copy(totalType = StatementTotalType.MONTHLY))
+        )
+            .isEqualTo("statement-month-total statement-amount-positive")
     }
 
     @Test

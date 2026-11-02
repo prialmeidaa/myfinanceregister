@@ -3,6 +3,7 @@ package paa.myfinanceregister.ui.views
 import paa.myfinanceregister.domain.model.Statement
 import java.math.BigDecimal
 import java.text.NumberFormat
+import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -16,8 +17,14 @@ data class StatementGridRow(
     val category: String,
     val account: String,
     val amount: BigDecimal,
-    val statement: Statement? = null
+    val statement: Statement? = null,
+    val totalType: StatementTotalType? = null
 )
+
+enum class StatementTotalType {
+    DAILY,
+    MONTHLY
+}
 
 object StatementGridRowFactory {
     fun formatAmount(amount: BigDecimal): String =
@@ -26,27 +33,42 @@ object StatementGridRowFactory {
             maximumFractionDigits = 2
         }.format(amount)
 
-    fun create(statements: List<Statement>): List<StatementGridRow> =
-        statements.groupBy { YearMonth.from(it.date) }
+    fun create(statements: List<Statement>): List<StatementGridRow> {
+        val runningTotals = runningTotalsByDate(statements)
+        return statements.groupBy { YearMonth.from(it.date) }
             .toSortedMap(reverseOrder())
-            .flatMap { (month, monthStatements) -> rowsForMonth(month, monthStatements) }
+            .values
+            .flatMap { monthStatements -> rowsForMonth(monthStatements, runningTotals) }
+    }
 
-    private fun rowsForMonth(month: YearMonth, statements: List<Statement>): List<StatementGridRow> =
+    private fun rowsForMonth(
+        statements: List<Statement>,
+        runningTotals: Map<LocalDate, BigDecimal>
+    ): List<StatementGridRow> =
         buildList {
-            statements.groupBy { it.date }.toSortedMap(reverseOrder()).forEach { (date, dayStatements) ->
+            val statementsByDate = statements.groupBy { it.date }
+            statementsByDate.toSortedMap(reverseOrder()).forEach { (date, dayStatements) ->
                 dayStatements.forEach { add(it.toGridRow()) }
-                add(StatementGridRow(date.format(DATE_FORMATTER), "Daily total", "", "", dayStatements.sumAmounts()))
+                add(
+                    StatementGridRow(
+                        "", "", "", "", runningTotals.getValue(date), totalType = StatementTotalType.DAILY
+                    )
+                )
             }
             add(
                 StatementGridRow(
-                    month.toString(),
-                    "Monthly total",
-                    "",
-                    "",
-                    statements.sumAmounts()
+                    "", "", "", "", statements.sumAmounts(), totalType = StatementTotalType.MONTHLY
                 )
             )
         }
+
+    private fun runningTotalsByDate(statements: List<Statement>): Map<LocalDate, BigDecimal> {
+        var runningTotal = BigDecimal.ZERO
+        return statements.groupBy { it.date }.toSortedMap().mapValues { (_, dayStatements) ->
+            runningTotal += dayStatements.sumAmounts()
+            runningTotal
+        }
+    }
 
     private fun Statement.toGridRow() = StatementGridRow(
         date.format(DATE_FORMATTER),

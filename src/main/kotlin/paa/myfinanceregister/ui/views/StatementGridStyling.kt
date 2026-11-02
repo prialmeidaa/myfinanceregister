@@ -48,7 +48,6 @@ internal object StatementGridStyling {
     private fun totalCellPart(row: StatementGridRow): String? =
         when (row.totalType) {
             StatementTotalType.DAILY -> "statement-total"
-            StatementTotalType.MONTHLY -> "statement-month-total"
             null -> null
         }
 }

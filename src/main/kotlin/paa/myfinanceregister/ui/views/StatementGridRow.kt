@@ -22,8 +22,7 @@ data class StatementGridRow(
 )
 
 enum class StatementTotalType {
-    DAILY,
-    MONTHLY
+    DAILY
 }
 
 object StatementGridRowFactory {
@@ -51,15 +50,11 @@ object StatementGridRowFactory {
                 dayStatements.forEach { add(it.toGridRow()) }
                 add(
                     StatementGridRow(
-                        "", "", "", "", runningTotals.getValue(date), totalType = StatementTotalType.DAILY
+                        "", "Daily balance", "", "", runningTotals.getValue(date),
+                        totalType = StatementTotalType.DAILY
                     )
                 )
             }
-            add(
-                StatementGridRow(
-                    "", "", "", "", statements.sumAmounts(), totalType = StatementTotalType.MONTHLY
-                )
-            )
         }
 
     private fun runningTotalsByDate(statements: List<Statement>): Map<LocalDate, BigDecimal> {

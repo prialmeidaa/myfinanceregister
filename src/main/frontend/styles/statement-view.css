@@ -4,12 +4,6 @@ vaadin-grid::part(statement-total) {
   font-weight: var(--aura-font-weight-semibold);
 }
 
-vaadin-grid::part(statement-month-total) {
-  background-color: var(--vaadin-background-container-strong);
-  color: var(--vaadin-text-color);
-  font-weight: var(--aura-font-weight-semibold);
-}
-
 vaadin-grid::part(statement-amount-positive) {
   color: var(--aura-blue-text);
 }

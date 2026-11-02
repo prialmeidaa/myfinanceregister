@@ -67,17 +67,13 @@ class StatementViewTests {
         assertThat(grid.dataProvider.fetch(Query()).toList().mapNotNull { it.statement })
             .containsExactly(statements[2], statements[0])
         assertThat(grid.dataProvider.fetch(Query()).toList()
-            .filter { it.totalType == StatementTotalType.MONTHLY }
-            .map { it.amount })
-            .containsExactly(BigDecimal("-5.00"), BigDecimal("30.00"))
-        assertThat(grid.dataProvider.fetch(Query()).toList()
             .filter { it.totalType == StatementTotalType.DAILY }
             .map { it.amount })
             .containsExactly(BigDecimal("-5.00"), BigDecimal("25.00"))
     }
 
     @Test
-    fun showsDailyAndMonthlyTotalsIncludingNegativeStatements() {
+    fun showsDailyBalancesIncludingNegativeStatements() {
         val statements = listOf(
             statement(LocalDate.of(2026, 10, 5), "Purchase", "100.00"),
             statement(LocalDate.of(2026, 10, 5), "Refund", "-25.00"),
@@ -91,18 +87,16 @@ class StatementViewTests {
         val rows = grid.dataProvider.fetch(Query()).toList()
 
         val totalRows = rows.filter { it.totalType != null }
-        assertThat(totalRows).hasSize(3)
+        assertThat(totalRows).hasSize(2)
         assertThat(totalRows).allSatisfy {
             assertThat(it.date).isEmpty()
-            assertThat(it.description).isEmpty()
+            assertThat(it.description).isEqualTo("Daily balance")
             assertThat(it.category).isEmpty()
             assertThat(it.account).isEmpty()
         }
         val dailyTotals = totalRows.filter { it.totalType == StatementTotalType.DAILY }
         assertThat(dailyTotals.map { it.amount })
             .containsExactly(BigDecimal("75.00"), BigDecimal("85.00"))
-        assertThat(totalRows.single { it.totalType == StatementTotalType.MONTHLY }.amount)
-            .isEqualByComparingTo("85.00")
     }
 
     @Test
@@ -112,7 +106,7 @@ class StatementViewTests {
 
         assertThat(rows.first().date).isEqualTo("05/10/2026")
         assertThat(rows[1].date).isEmpty()
-        assertThat(rows[1].description).isEmpty()
+        assertThat(rows[1].description).isEqualTo("Daily balance")
         assertThat(StatementGridRowFactory.formatAmount(rows.first().amount)).isEqualTo("1.234,50")
     }
 
@@ -126,10 +120,6 @@ class StatementViewTests {
             .isEqualTo("statement-total statement-amount-positive")
         assertThat(StatementGridStyling.amountCellParts(row.copy(amount = BigDecimal("-5.00"))))
             .isEqualTo("statement-total statement-amount-negative")
-        assertThat(
-            StatementGridStyling.amountCellParts(row.copy(totalType = StatementTotalType.MONTHLY))
-        )
-            .isEqualTo("statement-month-total statement-amount-positive")
     }
 
     @Test

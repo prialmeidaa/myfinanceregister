@@ -57,6 +57,19 @@ class StatementFormDialogTests {
     }
 
     @Test
+    fun dateAndAmountFieldsUseBrazilianFormatting() {
+        val dialog = StatementFormDialog(emptyList(), emptyList(), null) { _, _ -> false }
+        val components = descendants(dialog)
+        val dateField = components.filterIsInstance<DatePicker>().single()
+        val amountField = components.filterIsInstance<BigDecimalField>().single()
+
+        assertThat(dateField.locale.language).isEqualTo("pt")
+        assertThat(dateField.locale.country).isEqualTo("BR")
+        assertThat(amountField.locale.language).isEqualTo("pt")
+        assertThat(amountField.locale.country).isEqualTo("BR")
+    }
+
+    @Test
     fun saveSubmitsTheSelectedStatementValues() {
         val category = Category(1, "Food")
         val account = Account(2, "Checking")

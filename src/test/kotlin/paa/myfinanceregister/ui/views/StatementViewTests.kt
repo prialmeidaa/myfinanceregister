@@ -85,6 +85,16 @@ class StatementViewTests {
     }
 
     @Test
+    fun gridFormatsDatesAndAmountsForBrazilianLocale() {
+        val statement = statement(LocalDate.of(2026, 10, 5), "Purchase", "1234.50")
+        val rows = StatementGridRowFactory.create(listOf(statement))
+
+        assertThat(rows.first().date).isEqualTo("05/10/2026")
+        assertThat(rows.first { it.description == "Daily total" }.date).isEqualTo("05/10/2026")
+        assertThat(StatementGridRowFactory.formatAmount(rows.first().amount)).isEqualTo("1.234,50")
+    }
+
+    @Test
     fun deleteStatementRemovesItAndRefreshesTheGrid() {
         val statement = statement(LocalDate.of(2026, 10, 5), "Lunch").apply { id = 1 }
         val service = Mockito.mock(StatementService::class.java)

@@ -12,6 +12,7 @@ import paa.myfinanceregister.domain.model.Account
 import paa.myfinanceregister.domain.model.Category
 import paa.myfinanceregister.domain.model.Statement
 import paa.myfinanceregister.services.StatementFormData
+import java.util.Locale
 
 class StatementFormDialog(
     categories: List<Category>,
@@ -20,6 +21,8 @@ class StatementFormDialog(
     private val onSave: (Long?, StatementFormData) -> Boolean
 ) : Dialog() {
     private val dateField = DatePicker("Date").apply {
+        locale = BRAZILIAN_LOCALE
+        setI18n(DatePicker.DatePickerI18n().setDateFormat(DATE_FORMAT))
         isRequired = true
         value = statement?.date
     }
@@ -40,6 +43,7 @@ class StatementFormDialog(
         value = accounts.firstOrNull { it.id == statement?.account?.id }
     }
     private val amountField = BigDecimalField("Amount").apply {
+        locale = BRAZILIAN_LOCALE
         isRequired = true
         value = statement?.amount
     }
@@ -70,5 +74,10 @@ class StatementFormDialog(
             amountField.value
         )
         if (onSave(statement?.id, data)) close()
+    }
+
+    private companion object {
+        const val DATE_FORMAT = "dd/MM/yyyy"
+        val BRAZILIAN_LOCALE: Locale = Locale.forLanguageTag("pt-BR")
     }
 }

@@ -41,7 +41,9 @@ class StatementView(
         grid.addColumn(StatementGridRow::description).setHeader("Description").setAutoWidth(true)
         grid.addColumn(StatementGridRow::category).setHeader("Category").setAutoWidth(true)
         grid.addColumn(StatementGridRow::account).setHeader("Account").setAutoWidth(true)
-        grid.addColumn(StatementGridRow::amount).setHeader("Amount").setAutoWidth(true)
+        grid.addColumn { row -> StatementGridRowFactory.formatAmount(row.amount) }
+            .setHeader("Amount")
+            .setAutoWidth(true)
         grid.addComponentColumn { row ->
             val statement = row.statement ?: return@addComponentColumn HorizontalLayout()
             HorizontalLayout(

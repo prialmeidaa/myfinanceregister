@@ -2,7 +2,13 @@ package paa.myfinanceregister.ui.views
 
 import paa.myfinanceregister.domain.model.Statement
 import java.math.BigDecimal
+import java.text.NumberFormat
 import java.time.YearMonth
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+
+private val DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+private val BRAZILIAN_LOCALE = Locale.forLanguageTag("pt-BR")
 
 data class StatementGridRow(
     val date: String,
@@ -14,6 +20,12 @@ data class StatementGridRow(
 )
 
 object StatementGridRowFactory {
+    fun formatAmount(amount: BigDecimal): String =
+        NumberFormat.getNumberInstance(BRAZILIAN_LOCALE).apply {
+            minimumFractionDigits = 2
+            maximumFractionDigits = 2
+        }.format(amount)
+
     fun create(statements: List<Statement>): List<StatementGridRow> =
         statements.groupBy { YearMonth.from(it.date) }
             .toSortedMap(reverseOrder())
@@ -23,7 +35,7 @@ object StatementGridRowFactory {
         buildList {
             statements.groupBy { it.date }.toSortedMap(reverseOrder()).forEach { (date, dayStatements) ->
                 dayStatements.forEach { add(it.toGridRow()) }
-                add(StatementGridRow(date.toString(), "Daily total", "", "", dayStatements.sumAmounts()))
+                add(StatementGridRow(date.format(DATE_FORMATTER), "Daily total", "", "", dayStatements.sumAmounts()))
             }
             add(
                 StatementGridRow(
@@ -37,7 +49,7 @@ object StatementGridRowFactory {
         }
 
     private fun Statement.toGridRow() = StatementGridRow(
-        date.toString(),
+        date.format(DATE_FORMATTER),
         description,
         category.description,
         account.description,

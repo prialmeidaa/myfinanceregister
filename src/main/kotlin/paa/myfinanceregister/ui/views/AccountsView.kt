@@ -6,6 +6,7 @@ import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.html.Paragraph
 import com.vaadin.flow.component.icon.VaadinIcon
+import com.vaadin.flow.component.orderedlayout.FlexComponent
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.PageTitle
@@ -25,7 +26,11 @@ class AccountsView(private val service: AccountService) : VerticalLayout() {
 
     init {
         configureGrid()
-        add(Button("New account") { openForm() }, grid)
+        val actions = HorizontalLayout(Button("New account") { openForm() }).apply {
+            setWidthFull()
+            justifyContentMode = FlexComponent.JustifyContentMode.END
+        }
+        add(actions, grid)
         refreshGrid()
     }
 

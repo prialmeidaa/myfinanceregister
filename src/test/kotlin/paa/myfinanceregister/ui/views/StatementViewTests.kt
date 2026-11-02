@@ -3,6 +3,8 @@ package paa.myfinanceregister.ui.views
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.dependency.CssImport
 import com.vaadin.flow.component.notification.Notification
+import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.data.provider.Query
 import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
@@ -23,6 +25,19 @@ import java.time.LocalDate
 import java.time.YearMonth
 
 class StatementViewTests {
+    @Test
+    fun newStatementButtonIsAlignedToTheRightOfTheGrid() {
+        val view = createView(Mockito.mock(StatementService::class.java))
+        val actions = view.children.toList().filterIsInstance<HorizontalLayout>().single()
+        val actionComponents = actions.children.toList()
+
+        assertThat(actions.width).isEqualTo("100%")
+        assertThat(actionComponents.first()).isInstanceOf(StatementMonthFilter::class.java)
+        assertThat(actionComponents.last()).isInstanceOf(Button::class.java)
+        assertThat((actionComponents.last() as Button).text).isEqualTo("New statement")
+        assertThat(actions.getFlexGrow(actionComponents.first())).isEqualTo(1.0)
+    }
+
     @Test
     fun statementViewUsesSharedLayoutAndShowsAllStatementsInitially() {
         val statements = listOf(

@@ -34,7 +34,11 @@ class StatementView(
 
     init {
         StatementGridStyling.configure(grid, ::openForm, ::confirmDelete)
-        add(HorizontalLayout(Button("New statement") { openForm() }, monthFilter), grid)
+        val actions = HorizontalLayout(monthFilter, Button("New statement") { openForm() }).apply {
+            setWidthFull()
+            setFlexGrow(1.0, monthFilter)
+        }
+        add(actions, grid)
         refreshGrid()
     }
 

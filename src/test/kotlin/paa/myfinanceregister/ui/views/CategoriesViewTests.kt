@@ -6,6 +6,7 @@ import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.notification.Notification
+import com.vaadin.flow.component.orderedlayout.FlexComponent
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.component.treegrid.TreeGrid
@@ -38,6 +39,17 @@ class CategoriesViewTests {
         assertThat(treeGrid.dataProvider.hasChildren(root)).isTrue()
         assertThat(treeGrid.dataProvider.hasChildren(child)).isFalse()
         Mockito.verify(service).findAll()
+    }
+
+    @Test
+    fun newCategoryButtonIsAlignedToTheRightOfTheGrid() {
+        val view = CategoriesView(Mockito.mock(CategoryService::class.java))
+        val actions = view.children.toList().filterIsInstance<HorizontalLayout>().single()
+
+        assertThat(actions.width).isEqualTo("100%")
+        assertThat(actions.justifyContentMode).isEqualTo(FlexComponent.JustifyContentMode.END)
+        assertThat(actions.children.toList().filterIsInstance<Button>().single().text)
+            .isEqualTo("New category")
     }
 
     @Test

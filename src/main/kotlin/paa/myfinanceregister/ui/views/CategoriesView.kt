@@ -6,6 +6,7 @@ import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.grid.ColumnTextAlign
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.VaadinIcon
+import com.vaadin.flow.component.orderedlayout.FlexComponent
 import com.vaadin.flow.component.treegrid.TreeGrid
 import com.vaadin.flow.component.html.Paragraph
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
@@ -27,7 +28,11 @@ class CategoriesView(private val service: CategoryService) : VerticalLayout() {
 
     init {
         configureGrid()
-        add(Button("New category") { openForm() }, grid)
+        val actions = HorizontalLayout(Button("New category") { openForm() }).apply {
+            setWidthFull()
+            justifyContentMode = FlexComponent.JustifyContentMode.END
+        }
+        add(actions, grid)
         refreshGrid()
     }
 

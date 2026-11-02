@@ -2,6 +2,7 @@ package paa.myfinanceregister.ui.views
 
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import paa.myfinanceregister.domain.model.Statement
 
@@ -11,6 +12,21 @@ internal object StatementGridStyling {
         onEdit: (Statement) -> Unit,
         onDelete: (Statement) -> Unit
     ) {
+        grid.addComponentColumn { row ->
+            val statement = row.statement ?: return@addComponentColumn HorizontalLayout()
+            HorizontalLayout(
+                Button(VaadinIcon.PENCIL.create().apply { setSize(ACTION_ICON_SIZE) }) { onEdit(statement) }
+                    .apply {
+                        setAriaLabel("Edit")
+                        setTooltipText("Edit")
+                    },
+                Button(VaadinIcon.CLOSE.create().apply { setSize(ACTION_ICON_SIZE) }) { onDelete(statement) }
+                    .apply {
+                        setAriaLabel("Delete")
+                        setTooltipText("Delete")
+                    }
+            )
+        }.addTotalPart().setHeader("Actions").setKey("actions")
         grid.addColumn(StatementGridRow::date).addTotalPart()
             .setHeader("Date").setAutoWidth(true)
         grid.addColumn(StatementGridRow::description).addTotalPart()
@@ -23,13 +39,6 @@ internal object StatementGridStyling {
             .setHeader("Amount")
             .setAutoWidth(true)
             .setPartNameGenerator(::amountCellParts)
-        grid.addComponentColumn { row ->
-            val statement = row.statement ?: return@addComponentColumn HorizontalLayout()
-            HorizontalLayout(
-                Button("Edit") { onEdit(statement) },
-                Button("Delete") { onDelete(statement) }
-            )
-        }.addTotalPart().setHeader("Actions")
         grid.setSizeFull()
     }
 
@@ -50,4 +59,6 @@ internal object StatementGridStyling {
             StatementTotalType.DAILY -> "statement-total"
             null -> null
         }
+
+    private const val ACTION_ICON_SIZE = "14px"
 }

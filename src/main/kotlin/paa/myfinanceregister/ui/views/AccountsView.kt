@@ -5,6 +5,7 @@ import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.html.Paragraph
+import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.PageTitle
@@ -29,20 +30,35 @@ class AccountsView(private val service: AccountService) : VerticalLayout() {
     }
 
     private fun configureGrid() {
+        grid.addComponentColumn(::createActions).setHeader("Actions").setKey("actions")
         grid.addColumn(Account::description).setHeader("Description").setAutoWidth(true)
         grid.addColumn { if (it.active) "Active" else "Inactive" }.setHeader("Status")
-        grid.addComponentColumn(::createActions).setHeader("Actions")
         grid.setSizeFull()
     }
 
     private fun createActions(account: Account): Component = HorizontalLayout(
-        Button("Edit") { openForm(account) },
+        Button(VaadinIcon.PENCIL.create().apply { setSize(ACTION_ICON_SIZE) }) { openForm(account) }
+            .apply {
+                setAriaLabel("Edit")
+                setTooltipText("Edit")
+            },
         accountStatusButton(account)
     )
 
     private fun accountStatusButton(account: Account): Button {
-        if (account.active) return Button("Deactivate") { confirmDeactivation(account) }
-        return Button("Activate") { activateAccount(account) }
+        if (account.active) {
+            return Button(VaadinIcon.BAN.create().apply { setSize(ACTION_ICON_SIZE) }) {
+                confirmDeactivation(account)
+            }.apply {
+                setAriaLabel("Deactivate")
+                setTooltipText("Deactivate")
+            }
+        }
+        return Button(VaadinIcon.CHECK.create().apply { setSize(ACTION_ICON_SIZE) }) { activateAccount(account) }
+            .apply {
+                setAriaLabel("Activate")
+                setTooltipText("Activate")
+            }
     }
 
     private fun openForm(account: Account? = null) {
@@ -101,5 +117,9 @@ class AccountsView(private val service: AccountService) : VerticalLayout() {
 
     private fun refreshGrid() {
         grid.setItems(service.findAll())
+    }
+
+    private companion object {
+        const val ACTION_ICON_SIZE = "14px"
     }
 }

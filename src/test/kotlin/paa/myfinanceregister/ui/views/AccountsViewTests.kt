@@ -1,7 +1,12 @@
 package paa.myfinanceregister.ui.views
 
+import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.icon.Icon
+import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.notification.Notification
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout
+import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
 import jakarta.annotation.security.PermitAll
@@ -28,6 +33,34 @@ class AccountsViewTests {
         assertThat(AccountsView::class.java.isAnnotationPresent(PermitAll::class.java)).isTrue()
         assertThat(grid.dataProvider.isInMemory).isTrue()
         Mockito.verify(service).findAll()
+    }
+
+    @Test
+    fun accountActionsAreFirstAndUseDifferentIconsForStatus() {
+        val service = Mockito.mock(AccountService::class.java)
+        val grid = AccountsView(service).children.toList()
+            .filterIsInstance<Grid<Account>>()
+            .single()
+        val column = grid.columns.first()
+        val renderer = column.renderer as ComponentRenderer<HorizontalLayout, Account>
+        val activeButtons = renderer.createComponent(Account(1, "Checking"))
+            .children.toList().filterIsInstance<Button>()
+        val inactiveButtons = renderer.createComponent(Account(2, "Savings", active = false))
+            .children.toList().filterIsInstance<Button>()
+
+        assertThat(column.headerText).isEqualTo("Actions")
+        assertThat(column.key).isEqualTo("actions")
+        assertThat(activeButtons.map { it.text }).containsExactly("", "")
+        assertThat(activeButtons.map { it.ariaLabel.orElse("") }).containsExactly("Edit", "Deactivate")
+        assertThat(activeButtons.map { it.tooltip.text }).containsExactly("Edit", "Deactivate")
+        assertThat(activeButtons.map { (it.icon as Icon).icon })
+            .containsExactly(VaadinIcon.PENCIL.create().icon, VaadinIcon.BAN.create().icon)
+        assertThat(activeButtons.map { (it.icon as Icon).element.style.get("width") })
+            .containsExactly("14px", "14px")
+        assertThat(inactiveButtons.map { it.ariaLabel.orElse("") }).containsExactly("Edit", "Activate")
+        assertThat(inactiveButtons.map { it.tooltip.text }).containsExactly("Edit", "Activate")
+        assertThat(inactiveButtons.map { (it.icon as Icon).icon })
+            .containsExactly(VaadinIcon.PENCIL.create().icon, VaadinIcon.CHECK.create().icon)
     }
 
     @Test

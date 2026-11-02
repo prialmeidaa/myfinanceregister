@@ -1,6 +1,13 @@
 package paa.myfinanceregister.ui.views
 
+import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.grid.ColumnTextAlign
+import com.vaadin.flow.component.html.Span
+import com.vaadin.flow.component.icon.Icon
+import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.notification.Notification
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout
+import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.component.treegrid.TreeGrid
 import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
@@ -31,6 +38,35 @@ class CategoriesViewTests {
         assertThat(treeGrid.dataProvider.hasChildren(root)).isTrue()
         assertThat(treeGrid.dataProvider.hasChildren(child)).isFalse()
         Mockito.verify(service).findAll()
+    }
+
+    @Test
+    fun categoryActionsAreFirstAndUseIconOnlyButtons() {
+        val service = Mockito.mock(CategoryService::class.java)
+        val category = Category(id = 1, description = "Food")
+        val grid = CategoriesView(service).children.toList()
+            .filterIsInstance<TreeGrid<Category>>()
+            .single()
+        val column = grid.columns.first()
+        val renderer = column.renderer as ComponentRenderer<HorizontalLayout, Category>
+        val buttons = renderer.createComponent(category).children.toList().filterIsInstance<Button>()
+
+        assertThat(column.headerText).isEqualTo("Actions")
+        assertThat(column.key).isEqualTo("actions")
+        assertThat(buttons).hasSize(2)
+        assertThat(buttons.map { it.text }).containsExactly("", "")
+        assertThat(buttons.map { it.ariaLabel.orElse("") }).containsExactly("Edit", "Delete")
+        assertThat(buttons.map { it.tooltip.text }).containsExactly("Edit", "Delete")
+        assertThat(buttons.map { (it.icon as Icon).icon })
+            .containsExactly(VaadinIcon.PENCIL.create().icon, VaadinIcon.CLOSE.create().icon)
+        assertThat(buttons.map { (it.icon as Icon).element.style.get("width") })
+            .containsExactly("14px", "14px")
+        val descriptionColumn = grid.columns[1]
+        val descriptionHeader = descriptionColumn.headerComponent as Span
+        assertThat(descriptionHeader.text).isEqualTo("Description")
+        assertThat(descriptionHeader.element.style.get("margin-inline-start"))
+            .isEqualTo("calc(var(--vaadin-icon-size, 1lh) + var(--vaadin-gap-s))")
+        assertThat(descriptionColumn.textAlign).isEqualTo(ColumnTextAlign.LEFT)
     }
 
     @Test

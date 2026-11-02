@@ -3,6 +3,9 @@ package paa.myfinanceregister.ui.views
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.dialog.Dialog
+import com.vaadin.flow.component.grid.ColumnTextAlign
+import com.vaadin.flow.component.html.Span
+import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.treegrid.TreeGrid
 import com.vaadin.flow.component.html.Paragraph
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
@@ -29,14 +32,29 @@ class CategoriesView(private val service: CategoryService) : VerticalLayout() {
     }
 
     private fun configureGrid() {
-        grid.addHierarchyColumn(Category::description).setHeader("Description").setAutoWidth(true)
-        grid.addComponentColumn(::createActions).setHeader("Actions")
+        grid.addComponentColumn(::createActions).setHeader("Actions").setKey("actions")
+        grid.addHierarchyColumn(Category::description)
+            .setHeader(
+                Span("Description").apply {
+                    style.set("margin-inline-start", "calc(var(--vaadin-icon-size, 1lh) + var(--vaadin-gap-s))")
+                }
+            )
+            .setAutoWidth(true)
+            .setTextAlign(ColumnTextAlign.LEFT)
         grid.setSizeFull()
     }
 
     private fun createActions(category: Category): Component = HorizontalLayout(
-        Button("Edit") { openForm(category) },
-        Button("Delete") { confirmDelete(category) }
+        Button(VaadinIcon.PENCIL.create().apply { setSize(ACTION_ICON_SIZE) }) { openForm(category) }
+            .apply {
+                setAriaLabel("Edit")
+                setTooltipText("Edit")
+            },
+        Button(VaadinIcon.CLOSE.create().apply { setSize(ACTION_ICON_SIZE) }) { confirmDelete(category) }
+            .apply {
+                setAriaLabel("Delete")
+                setTooltipText("Delete")
+            }
     )
 
     private fun openForm(category: Category? = null) {
@@ -94,5 +112,9 @@ class CategoriesView(private val service: CategoryService) : VerticalLayout() {
         val roots = categories.filter { it.rootCategory == null }
         grid.setItems(roots) { category -> childrenByRoot[category].orEmpty() }
         grid.expandRecursively(roots, categories.size)
+    }
+
+    private companion object {
+        const val ACTION_ICON_SIZE = "14px"
     }
 }

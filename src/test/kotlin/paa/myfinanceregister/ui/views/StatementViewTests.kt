@@ -17,6 +17,7 @@ import paa.myfinanceregister.services.CategoryService
 import paa.myfinanceregister.services.StatementService
 import paa.myfinanceregister.ui.components.StatementMonthFilter
 import paa.myfinanceregister.ui.layout.MainLayout
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -32,13 +33,14 @@ class StatementViewTests {
         val view = createView(service)
         val route = StatementView::class.java.getAnnotation(Route::class.java)
         val title = StatementView::class.java.getAnnotation(PageTitle::class.java)
-        val grid = view.children.toList().filterIsInstance<Grid<Statement>>().single()
+        val grid = view.children.toList().filterIsInstance<Grid<StatementGridRow>>().single()
 
         assertThat(route.value).isEqualTo("statement")
         assertThat(route.layout.java).isEqualTo(MainLayout::class.java)
         assertThat(title.value).isEqualTo("Statement")
         assertThat(StatementView::class.java.isAnnotationPresent(PermitAll::class.java)).isTrue()
-        assertThat(grid.dataProvider.fetch(Query()).toList()).containsExactlyElementsOf(statements)
+        assertThat(grid.dataProvider.fetch(Query()).toList().mapNotNull { it.statement })
+            .containsExactlyElementsOf(statements)
     }
 
     @Test
@@ -56,10 +58,30 @@ class StatementViewTests {
             .filterIsInstance<StatementMonthFilter>()
             .single()
         monthFilter.value = setOf(YearMonth.of(2026, 10), YearMonth.of(2026, 8))
-        val grid = view.children.toList().filterIsInstance<Grid<Statement>>().single()
+        val grid = view.children.toList().filterIsInstance<Grid<StatementGridRow>>().single()
 
-        assertThat(grid.dataProvider.fetch(Query()).toList())
+        assertThat(grid.dataProvider.fetch(Query()).toList().mapNotNull { it.statement })
             .containsExactly(statements[0], statements[2])
+    }
+
+    @Test
+    fun showsDailyAndMonthlyTotalsIncludingNegativeStatements() {
+        val statements = listOf(
+            statement(LocalDate.of(2026, 10, 5), "Purchase", "100.00"),
+            statement(LocalDate.of(2026, 10, 5), "Refund", "-25.00"),
+            statement(LocalDate.of(2026, 10, 8), "Another purchase", "10.00")
+        )
+        val service = Mockito.mock(StatementService::class.java)
+        Mockito.`when`(service.findAll()).thenReturn(statements)
+        val grid = createView(service).children.toList()
+            .filterIsInstance<Grid<StatementGridRow>>()
+            .single()
+        val rows = grid.dataProvider.fetch(Query()).toList()
+
+        assertThat(rows.filter { it.description == "Daily total" }.map { it.amount })
+            .containsExactly(BigDecimal("10.00"), BigDecimal("75.00"))
+        assertThat(rows.single { it.description == "Monthly total" }.amount)
+            .isEqualByComparingTo("85.00")
     }
 
     @Test
@@ -68,7 +90,7 @@ class StatementViewTests {
         val service = Mockito.mock(StatementService::class.java)
         Mockito.`when`(service.findAll()).thenReturn(listOf(statement), emptyList())
         val view = createView(service)
-        val grid = view.children.toList().filterIsInstance<Grid<Statement>>().single()
+        val grid = view.children.toList().filterIsInstance<Grid<StatementGridRow>>().single()
 
         Mockito.mockStatic(Notification::class.java).use { notifications ->
             view.deleteStatement(statement)
@@ -91,10 +113,11 @@ class StatementViewTests {
         Mockito.mock(AccountService::class.java)
     )
 
-    private fun statement(date: LocalDate, description: String) = Statement(
+    private fun statement(date: LocalDate, description: String, amount: String = "0.00") = Statement(
         date = date,
         description = description,
         category = Category(1, "Food"),
-        account = Account(1, "Checking")
+        account = Account(1, "Checking"),
+        amount = BigDecimal(amount)
     )
 }

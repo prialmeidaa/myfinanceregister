@@ -69,7 +69,9 @@ class LocalDataInitializer(
             LocalStatementSeed("Supermarket", "Food", "Savings Account", "523.75", 0, 3),
             LocalStatementSeed("Gym membership", "Health", "Checking Account", "89.90", 0, 9),
             LocalStatementSeed("Monthly investment", "Entertainment", "Investments", "300.00", 0, 16),
-            LocalStatementSeed("Restaurant", "Food", "Primary Credit Card", "74.50", 0, 24)
+            LocalStatementSeed("Restaurant", "Food", "Primary Credit Card", "74.50", 0, 24),
+            LocalStatementSeed("Returned purchase", "Food", "Checking Account", "-45.00", 0, 3),
+            LocalStatementSeed("Service refund", "Transportation", "Wallet", "-25.00", 0, 18)
         )
     }
 }

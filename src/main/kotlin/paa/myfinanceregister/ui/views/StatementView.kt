@@ -27,7 +27,7 @@ class StatementView(
     private val categoryService: CategoryService,
     private val accountService: AccountService
 ) : VerticalLayout() {
-    private val grid = Grid<Statement>()
+    private val grid = Grid<StatementGridRow>()
     private val monthFilter = StatementMonthFilter(::refreshGrid)
 
     init {
@@ -37,12 +37,13 @@ class StatementView(
     }
 
     private fun configureGrid() {
-        grid.addColumn(Statement::date).setHeader("Date").setAutoWidth(true)
-        grid.addColumn(Statement::description).setHeader("Description").setAutoWidth(true)
-        grid.addColumn { it.category.description }.setHeader("Category").setAutoWidth(true)
-        grid.addColumn { it.account.description }.setHeader("Account").setAutoWidth(true)
-        grid.addColumn(Statement::amount).setHeader("Amount").setAutoWidth(true)
-        grid.addComponentColumn { statement ->
+        grid.addColumn(StatementGridRow::date).setHeader("Date").setAutoWidth(true)
+        grid.addColumn(StatementGridRow::description).setHeader("Description").setAutoWidth(true)
+        grid.addColumn(StatementGridRow::category).setHeader("Category").setAutoWidth(true)
+        grid.addColumn(StatementGridRow::account).setHeader("Account").setAutoWidth(true)
+        grid.addColumn(StatementGridRow::amount).setHeader("Amount").setAutoWidth(true)
+        grid.addComponentColumn { row ->
+            val statement = row.statement ?: return@addComponentColumn HorizontalLayout()
             HorizontalLayout(
                 Button("Edit") { openForm(statement) },
                 Button("Delete") { confirmDelete(statement) }
@@ -103,6 +104,6 @@ class StatementView(
     private fun refreshGrid() {
         val statements = service.findAll()
         monthFilter.updateMonths(statements)
-        grid.setItems(monthFilter.filter(statements))
+        grid.setItems(StatementGridRowFactory.create(monthFilter.filter(statements)))
     }
 }

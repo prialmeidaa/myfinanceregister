@@ -27,6 +27,7 @@ class LocalDataInitializerTests @Autowired constructor(
         assertThat(categoryRepository.count()).isGreaterThanOrEqualTo(5)
         assertThat(accountRepository.count()).isGreaterThanOrEqualTo(5)
         assertThat(statements).hasSizeGreaterThanOrEqualTo(10)
+        assertThat(statements.count { it.amount.signum() < 0 }).isGreaterThanOrEqualTo(2)
         assertThat(statementMonths).hasSizeGreaterThanOrEqualTo(3)
         assertThat(statementMonths.max()).isEqualTo(YearMonth.now())
     }

@@ -6,6 +6,7 @@ import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.data.provider.Query
+import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
 import jakarta.annotation.security.PermitAll
@@ -112,6 +113,23 @@ class StatementViewTests {
         val dailyTotals = totalRows.filter { it.totalType == StatementTotalType.DAILY }
         assertThat(dailyTotals.map { it.amount })
             .containsExactly(BigDecimal("75.00"), BigDecimal("85.00"))
+    }
+
+    @Test
+    fun editActionOpensAndClosesInlineDetailsForAStatementRow() {
+        val statement = statement(LocalDate.of(2026, 10, 5), "Purchase")
+        val service = Mockito.mock(StatementService::class.java)
+        Mockito.`when`(service.findAll()).thenReturn(listOf(statement))
+        val grid = createView(service).children.toList().filterIsInstance<Grid<StatementGridRow>>().single()
+        val row = grid.dataProvider.fetch(Query()).toList().first { it.statement != null }
+        val renderer = grid.columns.first().renderer as ComponentRenderer<HorizontalLayout, StatementGridRow>
+        val editButton = renderer.createComponent(row).children.toList().filterIsInstance<Button>().first()
+
+        editButton.click()
+        assertThat(grid.isDetailsVisible(row)).isTrue()
+
+        editButton.click()
+        assertThat(grid.isDetailsVisible(row)).isFalse()
     }
 
     @Test

@@ -51,7 +51,8 @@ class StatementGridStylingTests {
 
         val actionsColumn = grid.columns.first()
         val renderer = actionsColumn.renderer as ComponentRenderer<HorizontalLayout, StatementGridRow>
-        val layout = renderer.createComponent(StatementGridRow("", "", "", "", BigDecimal.ZERO, statement))
+        val row = StatementGridRow("", "", "", "", BigDecimal.ZERO, statement)
+        val layout = renderer.createComponent(row)
         val buttons = layout.children.toList().filterIsInstance<Button>()
 
         assertThat(actionsColumn.headerText).isEqualTo("Actions")

@@ -33,7 +33,15 @@ class StatementView(
     private val monthFilter = StatementMonthFilter(::refreshGrid)
 
     init {
-        StatementGridStyling.configure(grid, ::openForm, ::confirmDelete)
+        StatementGridStyling.configure(grid, ::toggleInlineEditor, ::confirmDelete)
+        StatementGridDetails.configure(
+            grid,
+            StatementGridDetailsConfiguration(
+                categoryService.findAll(),
+                accountService.findAll(),
+                ::saveStatement
+            )
+        )
         val actions = HorizontalLayout(monthFilter, Button("New statement") { openForm() }).apply {
             setWidthFull()
             setFlexGrow(1.0, monthFilter)
@@ -49,6 +57,10 @@ class StatementView(
             statement,
             ::saveStatement
         ).open()
+    }
+
+    private fun toggleInlineEditor(row: StatementGridRow) {
+        grid.setDetailsVisible(row, !grid.isDetailsVisible(row))
     }
 
     private fun saveStatement(id: Long?, data: StatementFormData): Boolean {

@@ -9,23 +9,11 @@ import paa.myfinanceregister.domain.model.Statement
 internal object StatementGridStyling {
     fun configure(
         grid: Grid<StatementGridRow>,
-        onEdit: (Statement) -> Unit,
+        onEdit: (StatementGridRow) -> Unit,
         onDelete: (Statement) -> Unit
     ) {
         grid.addComponentColumn { row ->
-            val statement = row.statement ?: return@addComponentColumn HorizontalLayout()
-            HorizontalLayout(
-                Button(VaadinIcon.PENCIL.create().apply { setSize(ACTION_ICON_SIZE) }) { onEdit(statement) }
-                    .apply {
-                        setAriaLabel("Edit")
-                        setTooltipText("Edit")
-                    },
-                Button(VaadinIcon.CLOSE.create().apply { setSize(ACTION_ICON_SIZE) }) { onDelete(statement) }
-                    .apply {
-                        setAriaLabel("Delete")
-                        setTooltipText("Delete")
-                    }
-            )
+            if (row.statement == null) HorizontalLayout() else actionButtons(row, onEdit, onDelete)
         }.addTotalPart().setHeader("Actions").setKey("actions")
             .setWidth(ACTIONS_COLUMN_WIDTH).setFlexGrow(0)
         grid.addColumn(StatementGridRow::date).addTotalPart()
@@ -43,6 +31,26 @@ internal object StatementGridStyling {
             .setFlexGrow(0)
             .setPartNameGenerator(::amountCellParts)
         grid.setSizeFull()
+    }
+
+    private fun actionButtons(
+        row: StatementGridRow,
+        onEdit: (StatementGridRow) -> Unit,
+        onDelete: (Statement) -> Unit
+    ): HorizontalLayout {
+        val statement = requireNotNull(row.statement)
+        return HorizontalLayout(
+            Button(VaadinIcon.PENCIL.create().apply { setSize(ACTION_ICON_SIZE) }) { onEdit(row) }
+                .apply {
+                    setAriaLabel("Edit")
+                    setTooltipText("Edit")
+                },
+            Button(VaadinIcon.CLOSE.create().apply { setSize(ACTION_ICON_SIZE) }) { onDelete(statement) }
+                .apply {
+                    setAriaLabel("Delete")
+                    setTooltipText("Delete")
+                }
+        )
     }
 
     fun amountCellParts(row: StatementGridRow): String {

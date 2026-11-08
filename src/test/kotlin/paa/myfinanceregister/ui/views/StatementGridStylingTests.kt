@@ -16,6 +16,22 @@ import java.time.LocalDate
 
 class StatementGridStylingTests {
     @Test
+    fun actionsDateAndAmountColumnsHaveFixedWidths() {
+        val grid = Grid<StatementGridRow>()
+
+        StatementGridStyling.configure(grid, {}, {})
+
+        val columnsByHeader = grid.columns.associateBy { it.headerText }
+
+        assertThat(columnsByHeader["Actions"]?.width).isEqualTo("100px")
+        assertThat(columnsByHeader["Actions"]?.flexGrow).isZero()
+        assertThat(columnsByHeader["Date"]?.width).isEqualTo("120px")
+        assertThat(columnsByHeader["Date"]?.flexGrow).isZero()
+        assertThat(columnsByHeader["Amount"]?.width).isEqualTo("140px")
+        assertThat(columnsByHeader["Amount"]?.flexGrow).isZero()
+    }
+
+    @Test
     fun actionsAreFirstColumnAndUseAccessibleIconOnlyButtons() {
         val statement = Statement(
             date = LocalDate.of(2026, 10, 5),

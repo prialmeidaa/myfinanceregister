@@ -50,7 +50,7 @@ object StatementGridRowFactory {
                 dayStatements.forEach { add(it.toGridRow()) }
                 add(
                     StatementGridRow(
-                        "", "Daily balance", "", "", runningTotals.getValue(date),
+                        "", "", "", "Daily balance", runningTotals.getValue(date),
                         totalType = StatementTotalType.DAILY
                     )
                 )

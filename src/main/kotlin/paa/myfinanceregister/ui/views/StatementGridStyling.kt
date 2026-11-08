@@ -27,17 +27,20 @@ internal object StatementGridStyling {
                     }
             )
         }.addTotalPart().setHeader("Actions").setKey("actions")
+            .setWidth(ACTIONS_COLUMN_WIDTH).setFlexGrow(0)
         grid.addColumn(StatementGridRow::date).addTotalPart()
-            .setHeader("Date").setAutoWidth(true)
+            .setHeader("Date").setWidth(DATE_COLUMN_WIDTH).setFlexGrow(0)
         grid.addColumn(StatementGridRow::description).addTotalPart()
             .setHeader("Description").setAutoWidth(true)
         grid.addColumn(StatementGridRow::category).addTotalPart()
             .setHeader("Category").setAutoWidth(true)
-        grid.addColumn(StatementGridRow::account).addTotalPart()
+        grid.addColumn(StatementGridRow::account)
+            .setPartNameGenerator(::accountCellParts)
             .setHeader("Account").setAutoWidth(true)
         grid.addColumn { row -> StatementGridRowFactory.formatAmount(row.amount) }
             .setHeader("Amount")
-            .setAutoWidth(true)
+            .setWidth(AMOUNT_COLUMN_WIDTH)
+            .setFlexGrow(0)
             .setPartNameGenerator(::amountCellParts)
         grid.setSizeFull()
     }
@@ -51,6 +54,12 @@ internal object StatementGridStyling {
         return listOfNotNull(totalCellPart(row), amountPart).joinToString(" ")
     }
 
+    fun accountCellParts(row: StatementGridRow): String =
+        listOfNotNull(
+            totalCellPart(row),
+            if (row.totalType == StatementTotalType.DAILY) "statement-total-label" else null
+        ).joinToString(" ")
+
     private fun Grid.Column<StatementGridRow>.addTotalPart(): Grid.Column<StatementGridRow> =
         setPartNameGenerator { row -> totalCellPart(row) }
 
@@ -61,4 +70,7 @@ internal object StatementGridStyling {
         }
 
     private const val ACTION_ICON_SIZE = "14px"
+    private const val ACTIONS_COLUMN_WIDTH = "100px"
+    private const val DATE_COLUMN_WIDTH = "120px"
+    private const val AMOUNT_COLUMN_WIDTH = "140px"
 }

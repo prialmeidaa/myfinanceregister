@@ -105,9 +105,9 @@ class StatementViewTests {
         assertThat(totalRows).hasSize(2)
         assertThat(totalRows).allSatisfy {
             assertThat(it.date).isEmpty()
-            assertThat(it.description).isEqualTo("Daily balance")
+            assertThat(it.description).isEmpty()
             assertThat(it.category).isEmpty()
-            assertThat(it.account).isEmpty()
+            assertThat(it.account).isEqualTo("Daily balance")
         }
         val dailyTotals = totalRows.filter { it.totalType == StatementTotalType.DAILY }
         assertThat(dailyTotals.map { it.amount })
@@ -121,7 +121,8 @@ class StatementViewTests {
 
         assertThat(rows.first().date).isEqualTo("05/10/2026")
         assertThat(rows[1].date).isEmpty()
-        assertThat(rows[1].description).isEqualTo("Daily balance")
+        assertThat(rows[1].description).isEmpty()
+        assertThat(rows[1].account).isEqualTo("Daily balance")
         assertThat(StatementGridRowFactory.formatAmount(rows.first().amount)).isEqualTo("1.234,50")
     }
 
@@ -135,6 +136,8 @@ class StatementViewTests {
             .isEqualTo("statement-total statement-amount-positive")
         assertThat(StatementGridStyling.amountCellParts(row.copy(amount = BigDecimal("-5.00"))))
             .isEqualTo("statement-total statement-amount-negative")
+        assertThat(StatementGridStyling.accountCellParts(row))
+            .isEqualTo("statement-total statement-total-label")
     }
 
     @Test

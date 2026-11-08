@@ -4,6 +4,12 @@ vaadin-grid::part(statement-total) {
   font-weight: var(--aura-font-weight-semibold);
 }
 
+vaadin-grid::part(statement-total-label) {
+  text-align: right;
+  font-size: 0.875em;
+  font-style: italic;
+}
+
 vaadin-grid::part(statement-amount-positive) {
   color: var(--aura-blue-text);
 }

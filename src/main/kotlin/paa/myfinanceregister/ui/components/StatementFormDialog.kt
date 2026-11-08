@@ -47,6 +47,7 @@ class StatementFormDialog(
         isRequired = true
         value = statement?.amount
     }
+    private val scheduleFields = StatementScheduleFields(statement)
 
     init {
         headerTitle = if (statement == null) "New statement" else "Edit statement"
@@ -57,6 +58,7 @@ class StatementFormDialog(
                 categoryField,
                 accountField,
                 amountField,
+                scheduleFields,
                 HorizontalLayout(
                     Button("Cancel") { close() },
                     Button("Save") { save(statement) }
@@ -66,14 +68,18 @@ class StatementFormDialog(
     }
 
     private fun save(statement: Statement?) {
+        val schedule = scheduleFields.selection()
         val data = StatementFormData(
             dateField.value,
             descriptionField.value,
             categoryField.value?.id,
             accountField.value?.id,
-            amountField.value
+            amountField.value,
+            schedule.type,
+            schedule.installmentNumber,
+            schedule.installmentCount
         )
-        if (onSave(statement?.id, data)) close()
+        StatementSaveConfirmation.submit(statement, data, { onSave(statement?.id, it) }) { close() }
     }
 
     private companion object {

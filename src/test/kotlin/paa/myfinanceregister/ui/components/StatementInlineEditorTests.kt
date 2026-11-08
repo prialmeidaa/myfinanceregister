@@ -6,11 +6,13 @@ import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.datepicker.DatePicker
 import com.vaadin.flow.component.textfield.BigDecimalField
 import com.vaadin.flow.component.textfield.TextField
+import com.vaadin.flow.component.radiobutton.RadioButtonGroup
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import paa.myfinanceregister.domain.model.Account
 import paa.myfinanceregister.domain.model.Category
 import paa.myfinanceregister.domain.model.Statement
+import paa.myfinanceregister.domain.model.StatementTransactionType
 import paa.myfinanceregister.services.StatementFormData
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -66,6 +68,14 @@ class StatementInlineEditorTests {
         descendants(editor).filterIsInstance<Button>().single { it.text == "Save" }.click()
 
         assertThat(closed).isTrue()
+    }
+
+    @Test
+    fun inlineEditorOffersTransactionTypeSelection() {
+        val editor = StatementInlineEditor(emptyList(), emptyList(), statement(), { _, _ -> false }, {})
+        val typeField = descendants(editor).filterIsInstance<RadioButtonGroup<StatementTransactionType>>().single()
+
+        assertThat(typeField.value).isEqualTo(StatementTransactionType.SINGLE)
     }
 
     private fun statement() = Statement(

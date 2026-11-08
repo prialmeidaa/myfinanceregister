@@ -47,10 +47,12 @@ class StatementInlineEditor(
         isRequired = true
         value = statement.amount
     }
+    private val scheduleFields = StatementScheduleFields(statement)
 
     init {
         add(
             HorizontalLayout(dateField, descriptionField, categoryField, accountField, amountField),
+            scheduleFields,
             HorizontalLayout(
                 Button("Cancel", { onCancel() }),
                 Button("Save", { save() })
@@ -60,14 +62,18 @@ class StatementInlineEditor(
     }
 
     private fun save() {
+        val schedule = scheduleFields.selection()
         val data = StatementFormData(
             dateField.value,
             descriptionField.value,
             categoryField.value?.id,
             accountField.value?.id,
-            amountField.value
+            amountField.value,
+            schedule.type,
+            schedule.installmentNumber,
+            schedule.installmentCount
         )
-        if (onSave(statement.id, data)) onCancel()
+        StatementSaveConfirmation.submit(statement, data, { onSave(statement.id, it) }) { onCancel() }
     }
 
     private companion object {

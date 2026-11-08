@@ -7,6 +7,7 @@ import org.mockito.Mockito
 import paa.myfinanceregister.domain.model.Account
 import paa.myfinanceregister.domain.model.Category
 import paa.myfinanceregister.domain.model.Statement
+import paa.myfinanceregister.domain.model.StatementKind
 import paa.myfinanceregister.domain.repository.AccountRepository
 import paa.myfinanceregister.domain.repository.CategoryRepository
 import paa.myfinanceregister.domain.repository.StatementRepository
@@ -26,7 +27,8 @@ class StatementServiceTests {
         "  Lunch  ",
         1,
         2,
-        BigDecimal("18.25")
+        BigDecimal("18.25"),
+        kind = StatementKind.INCOME
     )
 
     @Test
@@ -64,6 +66,66 @@ class StatementServiceTests {
 
         assertThat(saved).isSameAs(statement)
         assertThat(saved.description).isEqualTo("Lunch")
+    }
+
+    @Test
+    fun saveAlwaysStoresExpenseAmountsAsNegative() {
+        prepareReferences()
+        Mockito.`when`(statementRepository.save(Mockito.any(Statement::class.java)))
+            .thenAnswer { it.arguments[0] }
+
+        val saved = service.save(null, data.copy(kind = StatementKind.EXPENSE, amount = BigDecimal("-18.25")))
+
+        assertThat(saved.amount).isEqualByComparingTo("-18.25")
+    }
+
+    @Test
+    fun saveAlwaysStoresIncomeAmountsAsPositive() {
+        prepareReferences()
+        Mockito.`when`(statementRepository.save(Mockito.any(Statement::class.java)))
+            .thenAnswer { it.arguments[0] }
+
+        val saved = service.save(null, data.copy(amount = BigDecimal("-18.25")))
+
+        assertThat(saved.amount).isEqualByComparingTo("18.25")
+    }
+
+    @Test
+    fun saveTransferWithoutCategoryStoresOriginAndDestinationAccounts() {
+        prepareReferences()
+        val destination = Account(3, "Savings")
+        Mockito.`when`(accountRepository.findById(3)).thenReturn(Optional.of(destination))
+        Mockito.`when`(statementRepository.save(Mockito.any(Statement::class.java)))
+            .thenAnswer { it.arguments[0] }
+
+        val saved = service.save(
+            null,
+            data.copy(kind = StatementKind.TRANSFER, categoryId = null, destinationAccountId = 3)
+        )
+
+        assertThat(saved.category).isNull()
+        assertThat(saved.account).isSameAs(account)
+        assertThat(saved.destinationAccount).isSameAs(destination)
+        assertThat(saved.amount).isEqualByComparingTo("18.25")
+    }
+
+    @Test
+    fun saveTransferRejectsMissingDestinationAccount() {
+        assertThatThrownBy {
+            service.save(null, data.copy(kind = StatementKind.TRANSFER, categoryId = null))
+        }.isInstanceOf(IllegalArgumentException::class.java)
+            .hasMessage("Destination account is required")
+    }
+
+    @Test
+    fun saveTransferRejectsTheSameOriginAndDestinationAccount() {
+        assertThatThrownBy {
+            service.save(
+                null,
+                data.copy(kind = StatementKind.TRANSFER, categoryId = null, destinationAccountId = 2)
+            )
+        }.isInstanceOf(IllegalArgumentException::class.java)
+            .hasMessage("Origin and destination accounts must be different")
     }
 
     @Test

@@ -48,7 +48,9 @@ internal class StatementSeriesUpdater(private val repository: StatementRepositor
         statement.description = data.description
         statement.category = data.category
         statement.account = data.account
+        statement.destinationAccount = data.destinationAccount
         statement.amount = data.amount
+        statement.kind = data.kind
     }
 
     private fun clearSeries(statement: Statement) {

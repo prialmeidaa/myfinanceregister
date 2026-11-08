@@ -6,11 +6,13 @@ import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.datepicker.DatePicker
 import com.vaadin.flow.component.textfield.BigDecimalField
 import com.vaadin.flow.component.textfield.TextField
+import com.vaadin.flow.component.radiobutton.RadioButtonGroup
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import paa.myfinanceregister.domain.model.Account
 import paa.myfinanceregister.domain.model.Category
 import paa.myfinanceregister.domain.model.Statement
+import paa.myfinanceregister.domain.model.StatementKind
 import paa.myfinanceregister.services.StatementFormData
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -27,7 +29,7 @@ class StatementFormDialogTests {
         ) { _, _ -> false }
         val accountField = descendants(dialog)
             .filterIsInstance<ComboBox<Account>>()
-            .single { it.label == "Account" }
+            .single { it.label == "Account" || it.label == "Origin account" }
 
         assertThat(accountField.listDataView.items.toList()).containsExactly(activeAccount)
     }
@@ -50,9 +52,9 @@ class StatementFormDialogTests {
         ) { _, _ -> false }
         val components = descendants(dialog)
 
-        assertThat(components.filterIsInstance<ComboBox<Category>>().first().value)
+        assertThat(components.filterIsInstance<ComboBox<Category>>().single { it.label == "Category" }.value)
             .isSameAs(selectedCategory)
-        assertThat(components.filterIsInstance<ComboBox<Account>>().last().value)
+        assertThat(components.filterIsInstance<ComboBox<Account>>().single { it.label == "Account" }.value)
             .isSameAs(selectedAccount)
     }
 
@@ -83,8 +85,8 @@ class StatementFormDialogTests {
         val components = descendants(dialog)
         components.filterIsInstance<DatePicker>().single().value = LocalDate.of(2026, 10, 28)
         components.filterIsInstance<TextField>().single().value = "Lunch"
-        components.filterIsInstance<ComboBox<Category>>().first().value = category
-        components.filterIsInstance<ComboBox<Account>>().last().value = account
+        components.filterIsInstance<ComboBox<Category>>().single { it.label == "Category" }.value = category
+        components.filterIsInstance<ComboBox<Account>>().single { it.label == "Account" }.value = account
         components.filterIsInstance<BigDecimalField>().single().value = BigDecimal("18.25")
 
         components.filterIsInstance<Button>().single { it.text == "Save" }.click()
@@ -95,6 +97,36 @@ class StatementFormDialogTests {
         assertThat(submittedData?.categoryId).isEqualTo(1)
         assertThat(submittedData?.accountId).isEqualTo(2)
         assertThat(submittedData?.amount).isEqualByComparingTo("18.25")
+    }
+
+    @Test
+    fun saveSubmitsTransferWithoutCategoryAndWithBothAccounts() {
+        val origin = Account(2, "Checking")
+        val destination = Account(3, "Savings")
+        var submittedData: StatementFormData? = null
+        val dialog = StatementFormDialog(
+            listOf(Category(1, "Food")),
+            listOf(origin, destination),
+            null
+        ) { _, data ->
+            submittedData = data
+            false
+        }
+        val components = descendants(dialog)
+        components.filterIsInstance<DatePicker>().single().value = LocalDate.of(2026, 10, 28)
+        components.filterIsInstance<TextField>().single().value = "Transfer"
+        components.filterIsInstance<BigDecimalField>().single().value = BigDecimal("50.00")
+        components.filterIsInstance<RadioButtonGroup<StatementKind>>()
+            .single { it.label == "Transaction type" }.value = StatementKind.TRANSFER
+        components.filterIsInstance<ComboBox<Account>>().single { it.label == "Origin account" }.value = origin
+        components.filterIsInstance<ComboBox<Account>>().single { it.label == "Destination account" }.value = destination
+
+        components.filterIsInstance<Button>().single { it.text == "Save" }.click()
+
+        assertThat(submittedData?.kind).isEqualTo(StatementKind.TRANSFER)
+        assertThat(submittedData?.categoryId).isNull()
+        assertThat(submittedData?.accountId).isEqualTo(2)
+        assertThat(submittedData?.destinationAccountId).isEqualTo(3)
     }
 
     private fun descendants(component: Component): List<Component> =

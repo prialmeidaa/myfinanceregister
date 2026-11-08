@@ -14,7 +14,7 @@ internal data class StatementScheduleSelection(
 )
 
 internal class StatementScheduleFields(statement: Statement?) : VerticalLayout() {
-    private val typeField = RadioButtonGroup<StatementTransactionType>("Transaction type").apply {
+    private val typeField = RadioButtonGroup<StatementTransactionType>("Schedule").apply {
         setItems(StatementTransactionType.entries)
         setItemLabelGenerator {
             when (it) {

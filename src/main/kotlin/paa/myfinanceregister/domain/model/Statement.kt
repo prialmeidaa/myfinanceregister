@@ -19,6 +19,12 @@ enum class StatementTransactionType {
     INSTALLMENT
 }
 
+enum class StatementKind {
+    INCOME,
+    EXPENSE,
+    TRANSFER
+}
+
 @Entity
 class Statement(
     @Id
@@ -28,14 +34,19 @@ class Statement(
     var date: LocalDate = LocalDate.now(),
     @Column(nullable = false)
     var description: String = "",
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "category_id", nullable = false)
-    var category: Category = Category(),
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    var category: Category? = Category(),
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "account_id", nullable = false)
     var account: Account = Account(),
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "destination_account_id")
+    var destinationAccount: Account? = null,
     @Column(nullable = false, precision = 19, scale = 2)
     var amount: BigDecimal = BigDecimal.ZERO,
+    @Enumerated(EnumType.STRING)
+    var kind: StatementKind? = null,
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     var transactionType: StatementTransactionType = StatementTransactionType.SINGLE,

@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test
 import paa.myfinanceregister.domain.model.Account
 import paa.myfinanceregister.domain.model.Category
 import paa.myfinanceregister.domain.model.Statement
+import paa.myfinanceregister.domain.model.StatementKind
 import paa.myfinanceregister.domain.model.StatementTransactionType
 import paa.myfinanceregister.services.StatementFormData
 import java.math.BigDecimal
@@ -50,7 +51,14 @@ class StatementInlineEditorTests {
 
         assertThat(submittedId).isEqualTo(5)
         assertThat(submittedData).isEqualTo(
-            StatementFormData(LocalDate.of(2026, 10, 28), "Lunch", 1, 2, BigDecimal("18.25"))
+            StatementFormData(
+                LocalDate.of(2026, 10, 28),
+                "Lunch",
+                1,
+                2,
+                BigDecimal("18.25"),
+                kind = StatementKind.EXPENSE
+            )
         )
     }
 
@@ -73,9 +81,39 @@ class StatementInlineEditorTests {
     @Test
     fun inlineEditorOffersTransactionTypeSelection() {
         val editor = StatementInlineEditor(emptyList(), emptyList(), statement(), { _, _ -> false }, {})
-        val typeField = descendants(editor).filterIsInstance<RadioButtonGroup<StatementTransactionType>>().single()
+        val typeField = descendants(editor).filterIsInstance<RadioButtonGroup<StatementTransactionType>>()
+            .single { it.label == "Schedule" }
 
         assertThat(typeField.value).isEqualTo(StatementTransactionType.SINGLE)
+    }
+
+    @Test
+    fun inlineEditorSubmitsTransferAccountsWithoutCategory() {
+        val origin = Account(2, "Checking")
+        val destination = Account(3, "Savings")
+        var submittedData: StatementFormData? = null
+        val editor = StatementInlineEditor(
+            listOf(Category(1, "Food")),
+            listOf(origin, destination),
+            statement(),
+            onSave = { _, data ->
+                submittedData = data
+                false
+            },
+            onCancel = {}
+        )
+        val components = descendants(editor)
+        components.filterIsInstance<RadioButtonGroup<StatementKind>>()
+            .single { it.label == "Transaction type" }.value = StatementKind.TRANSFER
+        components.filterIsInstance<ComboBox<Account>>().single { it.label == "Origin account" }.value = origin
+        components.filterIsInstance<ComboBox<Account>>().single { it.label == "Destination account" }.value = destination
+
+        components.filterIsInstance<Button>().single { it.text == "Save" }.click()
+
+        assertThat(submittedData?.kind).isEqualTo(StatementKind.TRANSFER)
+        assertThat(submittedData?.categoryId).isNull()
+        assertThat(submittedData?.accountId).isEqualTo(2)
+        assertThat(submittedData?.destinationAccountId).isEqualTo(3)
     }
 
     private fun statement() = Statement(

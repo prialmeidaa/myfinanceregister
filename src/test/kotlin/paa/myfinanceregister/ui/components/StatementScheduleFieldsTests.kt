@@ -19,7 +19,8 @@ class StatementScheduleFieldsTests {
             false
         }
         val components = descendants(dialog)
-        components.filterIsInstance<RadioButtonGroup<StatementTransactionType>>().single().value =
+        components.filterIsInstance<RadioButtonGroup<StatementTransactionType>>()
+            .single { it.label == "Schedule" }.value =
             StatementTransactionType.INSTALLMENT
         components.filterIsInstance<IntegerField>().first { it.label == "Installment number" }.value = 1
         components.filterIsInstance<IntegerField>().first { it.label == "Total installments" }.value = 3

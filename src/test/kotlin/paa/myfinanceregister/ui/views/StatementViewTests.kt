@@ -16,6 +16,7 @@ import org.mockito.Mockito
 import paa.myfinanceregister.domain.model.Account
 import paa.myfinanceregister.domain.model.Category
 import paa.myfinanceregister.domain.model.Statement
+import paa.myfinanceregister.domain.model.StatementKind
 import paa.myfinanceregister.services.AccountService
 import paa.myfinanceregister.services.CategoryService
 import paa.myfinanceregister.services.StatementService
@@ -113,6 +114,25 @@ class StatementViewTests {
         val dailyTotals = totalRows.filter { it.totalType == StatementTotalType.DAILY }
         assertThat(dailyTotals.map { it.amount })
             .containsExactly(BigDecimal("75.00"), BigDecimal("85.00"))
+    }
+
+    @Test
+    fun transferCreatesNegativeOriginAndPositiveDestinationRowsWithNeutralDailyBalance() {
+        val transfer = statement(LocalDate.of(2026, 10, 5), "Savings", "50.00").apply {
+            kind = StatementKind.TRANSFER
+            destinationAccount = Account(2, "Savings")
+        }
+
+        val rows = StatementGridRowFactory.create(listOf(transfer))
+        val transactionRows = rows.filter { it.totalType == null }
+        val dailyBalance = rows.single { it.totalType == StatementTotalType.DAILY }
+
+        assertThat(transactionRows.map { it.category }).containsExactly("Transfer", "Transfer")
+        assertThat(transactionRows.map { it.account }).containsExactly("Checking", "Savings")
+        assertThat(transactionRows.map { it.amount })
+            .containsExactly(BigDecimal("-50.00"), BigDecimal("50.00"))
+        assertThat(transactionRows.map { it.statement }).containsExactly(transfer, null)
+        assertThat(dailyBalance.amount).isEqualByComparingTo("0.00")
     }
 
     @Test

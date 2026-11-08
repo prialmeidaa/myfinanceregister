@@ -1,7 +1,6 @@
 package paa.myfinanceregister.ui.components
 
 import com.vaadin.flow.component.button.Button
-import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.datepicker.DatePicker
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
@@ -30,18 +29,11 @@ class StatementFormDialog(
         isRequired = true
         value = statement?.description.orEmpty()
     }
-    private val categoryField = ComboBox<Category>("Category").apply {
-        isRequired = true
-        setItemLabelGenerator { it.description }
-        setItems(categories)
-        value = categories.firstOrNull { it.id == statement?.category?.id }
-    }
-    private val accountField = ComboBox<Account>("Account").apply {
-        isRequired = true
-        setItemLabelGenerator { it.description }
-        setItems(if (statement == null) accounts.filter { it.active } else accounts)
-        value = accounts.firstOrNull { it.id == statement?.account?.id }
-    }
+    private val financialFields = StatementFinancialFields(
+        categories,
+        if (statement == null) accounts.filter { it.active } else accounts,
+        statement
+    )
     private val amountField = BigDecimalField("Amount").apply {
         locale = BRAZILIAN_LOCALE
         isRequired = true
@@ -55,8 +47,7 @@ class StatementFormDialog(
             VerticalLayout(
                 dateField,
                 descriptionField,
-                categoryField,
-                accountField,
+                financialFields,
                 amountField,
                 scheduleFields,
                 HorizontalLayout(
@@ -69,15 +60,18 @@ class StatementFormDialog(
 
     private fun save(statement: Statement?) {
         val schedule = scheduleFields.selection()
+        val financial = financialFields.selection()
         val data = StatementFormData(
             dateField.value,
             descriptionField.value,
-            categoryField.value?.id,
-            accountField.value?.id,
+            financial.categoryId,
+            financial.accountId,
             amountField.value,
             schedule.type,
             schedule.installmentNumber,
-            schedule.installmentCount
+            schedule.installmentCount,
+            kind = financial.kind,
+            destinationAccountId = financial.destinationAccountId
         )
         StatementSaveConfirmation.submit(statement, data, { onSave(statement?.id, it) }) { close() }
     }

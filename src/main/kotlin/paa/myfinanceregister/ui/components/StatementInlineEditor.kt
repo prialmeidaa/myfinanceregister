@@ -1,7 +1,6 @@
 package paa.myfinanceregister.ui.components
 
 import com.vaadin.flow.component.button.Button
-import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.datepicker.DatePicker
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
@@ -30,18 +29,7 @@ class StatementInlineEditor(
         isRequired = true
         value = statement.description
     }
-    private val categoryField = ComboBox<Category>("Category").apply {
-        isRequired = true
-        setItemLabelGenerator { it.description }
-        setItems(categories)
-        value = categories.firstOrNull { it.id == statement.category.id }
-    }
-    private val accountField = ComboBox<Account>("Account").apply {
-        isRequired = true
-        setItemLabelGenerator { it.description }
-        setItems(accounts)
-        value = accounts.firstOrNull { it.id == statement.account.id }
-    }
+    private val financialFields = StatementFinancialFields(categories, accounts, statement)
     private val amountField = BigDecimalField("Amount").apply {
         locale = BRAZILIAN_LOCALE
         isRequired = true
@@ -51,7 +39,7 @@ class StatementInlineEditor(
 
     init {
         add(
-            HorizontalLayout(dateField, descriptionField, categoryField, accountField, amountField),
+            HorizontalLayout(dateField, descriptionField, financialFields, amountField),
             scheduleFields,
             HorizontalLayout(
                 Button("Cancel", { onCancel() }),
@@ -63,15 +51,18 @@ class StatementInlineEditor(
 
     private fun save() {
         val schedule = scheduleFields.selection()
+        val financial = financialFields.selection()
         val data = StatementFormData(
             dateField.value,
             descriptionField.value,
-            categoryField.value?.id,
-            accountField.value?.id,
+            financial.categoryId,
+            financial.accountId,
             amountField.value,
             schedule.type,
             schedule.installmentNumber,
-            schedule.installmentCount
+            schedule.installmentCount,
+            kind = financial.kind,
+            destinationAccountId = financial.destinationAccountId
         )
         StatementSaveConfirmation.submit(statement, data, { onSave(statement.id, it) }) { onCancel() }
     }

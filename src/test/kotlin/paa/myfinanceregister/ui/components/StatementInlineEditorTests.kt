@@ -4,6 +4,7 @@ import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.datepicker.DatePicker
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.textfield.BigDecimalField
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup
@@ -85,6 +86,19 @@ class StatementInlineEditorTests {
             .single { it.label == "Schedule" }
 
         assertThat(typeField.value).isEqualTo(StatementTransactionType.SINGLE)
+    }
+
+    @Test
+    fun inlineEditorGroupsFieldsIntoAlignedRows() {
+        val editor = StatementInlineEditor(emptyList(), emptyList(), statement(), { _, _ -> false }, {})
+        val rows = editor.children.toList().filterIsInstance<HorizontalLayout>()
+
+        assertThat(editor.classNames).contains("statement-inline-editor")
+        assertThat(rows).hasSize(3)
+        assertThat(rows[0].classNames).contains("statement-inline-editor-primary-row")
+        assertThat(rows[1].classNames).contains("statement-inline-editor-options-row")
+        assertThat(rows[0].children.toList()).hasSize(3)
+        assertThat(rows[1].children.toList()).hasSize(2)
     }
 
     @Test

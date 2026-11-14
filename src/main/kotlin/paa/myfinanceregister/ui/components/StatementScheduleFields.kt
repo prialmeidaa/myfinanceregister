@@ -1,6 +1,7 @@
 package paa.myfinanceregister.ui.components
 
 import com.vaadin.flow.component.html.Paragraph
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup
 import com.vaadin.flow.component.textfield.IntegerField
@@ -35,9 +36,15 @@ internal class StatementScheduleFields(statement: Statement?) : VerticalLayout()
     }
     private val recurringNote =
         Paragraph("Recurring transactions will continue through the end of the current year.")
+    private val installmentFields = HorizontalLayout(installmentNumberField, installmentCountField).apply {
+        setWidthFull()
+        setFlexGrow(1.0, installmentNumberField, installmentCountField)
+    }
 
     init {
-        add(typeField, installmentNumberField, installmentCountField, recurringNote)
+        add(typeField, installmentFields, recurringNote)
+        setWidthFull()
+        setPadding(false)
         typeField.addValueChangeListener { updateVisibility() }
         updateVisibility()
     }

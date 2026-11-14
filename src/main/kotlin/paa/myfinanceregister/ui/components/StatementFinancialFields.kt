@@ -1,6 +1,7 @@
 package paa.myfinanceregister.ui.components
 
 import com.vaadin.flow.component.combobox.ComboBox
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup
 import paa.myfinanceregister.domain.model.Account
@@ -49,9 +50,15 @@ internal class StatementFinancialFields(
         setItems(accounts)
         value = accounts.firstOrNull { it.id == statement?.destinationAccount?.id }
     }
+    private val accountFields = HorizontalLayout(categoryField, accountField, destinationAccountField).apply {
+        setWidthFull()
+        setFlexGrow(1.0, categoryField, accountField, destinationAccountField)
+    }
 
     init {
-        add(kindField, categoryField, accountField, destinationAccountField)
+        add(kindField, accountFields)
+        setWidthFull()
+        setPadding(false)
         kindField.addValueChangeListener { updateVisibility() }
         updateVisibility()
     }

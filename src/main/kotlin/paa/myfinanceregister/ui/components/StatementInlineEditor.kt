@@ -24,6 +24,7 @@ class StatementInlineEditor(
         setI18n(DatePicker.DatePickerI18n().setDateFormat(DATE_FORMAT))
         isRequired = true
         value = statement.date
+        width = "12rem"
     }
     private val descriptionField = TextField("Description").apply {
         isRequired = true
@@ -34,19 +35,38 @@ class StatementInlineEditor(
         locale = BRAZILIAN_LOCALE
         isRequired = true
         value = statement.amount
+        width = "12rem"
     }
     private val scheduleFields = StatementScheduleFields(statement)
+    private val primaryFields = HorizontalLayout(dateField, descriptionField, amountField).apply {
+        setWidthFull()
+        setFlexGrow(1.0, descriptionField)
+        addClassName("statement-inline-editor-row")
+        addClassName("statement-inline-editor-primary-row")
+    }
+    private val optionFields = HorizontalLayout(financialFields, scheduleFields).apply {
+        setWidthFull()
+        setFlexGrow(1.0, financialFields, scheduleFields)
+        addClassName("statement-inline-editor-row")
+        addClassName("statement-inline-editor-options-row")
+    }
+    private val actions = HorizontalLayout(
+        Button("Cancel", { onCancel() }),
+        Button("Save", { save() })
+    ).apply {
+        setWidthFull()
+        addClassName("statement-inline-editor-actions")
+    }
 
     init {
         add(
-            HorizontalLayout(dateField, descriptionField, financialFields, amountField),
-            scheduleFields,
-            HorizontalLayout(
-                Button("Cancel", { onCancel() }),
-                Button("Save", { save() })
-            )
+            primaryFields,
+            optionFields,
+            actions
         )
         setWidthFull()
+        setPadding(false)
+        addClassName("statement-inline-editor")
     }
 
     private fun save() {

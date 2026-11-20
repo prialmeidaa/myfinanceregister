@@ -10,6 +10,14 @@ Also consult the [test.md](.github/agents/test.md) document.
 
 Every implementation must be accompanied by automated tests that cover the implemented behavior.
 
+## Vaadin Flow, Impeccable, and MCP Architecture and UI Rules
+
+- This project uses Vaadin Flow and its server-side Java API from Kotlin. Never generate standalone HTML, JSX/React, or Tailwind CSS classes.
+- Before creating or changing Vaadin components, consult the available Vaadin MCP tools to verify the Java API, properties, and variants for the Vaadin version currently used by the project.
+- When applying visual guidance from Impeccable skills (such as `/polish`, `/audit`, `/critique`, or `/teach-impeccable`), translate every design decision—including hierarchy, contrast, spacing, and typography—into:
+  1. Native Vaadin Java API components and layouts, such as `VerticalLayout`, `HorizontalLayout`, `FormLayout`, and `LumoUtility`.
+  2. Theme CSS variables (`--lumo-*` or `--aura-*`) and `::part(...)` selectors in `src/main/frontend/themes/<theme-name>/styles.css` (or `frontend/themes/...`).
+
 ## File tracking
 
 - Whenever you create a new file, stage it with `git add`.

@@ -4,6 +4,7 @@ import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.textfield.TextField
+import com.vaadin.flow.data.provider.Query
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import paa.myfinanceregister.domain.model.Category
@@ -20,6 +21,19 @@ class CategoryFormDialogTests {
         assertThat(components.filterIsInstance<TextField>().single().value).isEqualTo("Food")
         assertThat(rootField.value).isSameAs(root)
         assertThat(components.filterIsInstance<Button>().map { it.text }).containsExactly("Cancel", "Save")
+        assertThat(rootField.helperText).isEqualTo("Leave empty for a top-level category.")
+    }
+
+    @Test
+    fun editDialogExcludesCategoryAndItsDescendantsFromRootOptions() {
+        val expenses = Category(1L, "Expenses")
+        val food = Category(2L, "Food", expenses)
+        val groceries = Category(3L, "Groceries", food)
+        val dialog = CategoryFormDialog(listOf(expenses, food, groceries), expenses) { _, _, _ -> true }
+        val rootField = descendants(dialog).filterIsInstance<ComboBox<Category>>().single()
+        val availableRoots = rootField.dataProvider.fetch(Query()).toList()
+
+        assertThat(availableRoots).isEmpty()
     }
 
     private fun descendants(component: Component): List<Component> =

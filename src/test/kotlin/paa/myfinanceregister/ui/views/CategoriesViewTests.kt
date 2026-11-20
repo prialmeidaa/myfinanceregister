@@ -3,6 +3,7 @@ package paa.myfinanceregister.ui.views
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.button.ButtonVariant
 import com.vaadin.flow.component.grid.ColumnTextAlign
+import com.vaadin.flow.component.grid.GridVariant
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.icon.VaadinIcon
@@ -40,6 +41,8 @@ class CategoriesViewTests {
         assertThat(CategoriesView::class.java.isAnnotationPresent(PermitAll::class.java)).isTrue()
         assertThat(treeGrid.dataProvider.hasChildren(root)).isTrue()
         assertThat(treeGrid.dataProvider.hasChildren(child)).isFalse()
+        assertThat(treeGrid.themeNames)
+            .contains(GridVariant.NO_BORDER.variantName, GridVariant.ROW_STRIPES.variantName)
         Mockito.verify(service).findAll()
     }
 
@@ -77,7 +80,7 @@ class CategoriesViewTests {
         assertThat(buttons.map { (it.icon as Icon).icon })
             .containsExactly(VaadinIcon.PENCIL.create().icon, VaadinIcon.CLOSE.create().icon)
         assertThat(buttons.map { (it.icon as Icon).element.style.get("width") })
-            .containsExactly("14px", "14px")
+            .containsExactly("16px", "16px")
         val descriptionColumn = grid.columns[1]
         val descriptionHeader = descriptionColumn.headerComponent as Span
         assertThat(descriptionHeader.text).isEqualTo("Description")

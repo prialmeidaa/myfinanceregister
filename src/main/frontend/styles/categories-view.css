@@ -1,0 +1,24 @@
+.categories-view {
+  gap: var(--vaadin-gap-m);
+  box-sizing: border-box;
+}
+
+.category-actions {
+  gap: var(--vaadin-gap-xs);
+  align-items: center;
+}
+
+@media (max-width: 600px) {
+  .categories-view-header {
+    row-gap: var(--vaadin-gap-s);
+  }
+
+  .categories-view-header .view-title,
+  .categories-view-header vaadin-button {
+    flex-basis: 100%;
+  }
+
+  .categories-view-header vaadin-button {
+    box-sizing: border-box;
+  }
+}

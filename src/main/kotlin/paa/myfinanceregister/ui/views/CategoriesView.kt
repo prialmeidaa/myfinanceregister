@@ -3,14 +3,14 @@ package paa.myfinanceregister.ui.views
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.button.ButtonVariant
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog
 import com.vaadin.flow.component.dependency.CssImport
-import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.grid.ColumnTextAlign
+import com.vaadin.flow.component.grid.GridVariant
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.orderedlayout.FlexComponent
 import com.vaadin.flow.component.treegrid.TreeGrid
-import com.vaadin.flow.component.html.Paragraph
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.PageTitle
@@ -27,10 +27,12 @@ import paa.myfinanceregister.ui.layout.MainLayout
 @PageTitle("Categories")
 @PermitAll
 @CssImport("./styles/view-title.css")
+@CssImport("./styles/categories-view.css")
 class CategoriesView(private val service: CategoryService) : VerticalLayout() {
     private val grid = TreeGrid<Category>()
 
     init {
+        addClassName("categories-view")
         configureGrid()
         val title = ViewTitle("Categories")
         val actions = HorizontalLayout(
@@ -42,13 +44,16 @@ class CategoriesView(private val service: CategoryService) : VerticalLayout() {
             setWidthFull()
             justifyContentMode = FlexComponent.JustifyContentMode.END
             setFlexGrow(1.0, title)
+            element.style.set("flex-wrap", "wrap")
             addClassName("view-header")
+            addClassName("categories-view-header")
         }
         add(actions, grid)
         refreshGrid()
     }
 
     private fun configureGrid() {
+        grid.addThemeVariants(GridVariant.NO_BORDER, GridVariant.ROW_STRIPES)
         grid.addComponentColumn(::createActions).setHeader("Actions").setKey("actions")
         grid.addHierarchyColumn(Category::description)
             .setHeader(
@@ -59,6 +64,7 @@ class CategoriesView(private val service: CategoryService) : VerticalLayout() {
             .setAutoWidth(true)
             .setTextAlign(ColumnTextAlign.LEFT)
         grid.setSizeFull()
+        grid.setEmptyStateText("No categories have been created")
     }
 
     private fun createActions(category: Category): Component = HorizontalLayout(
@@ -66,13 +72,18 @@ class CategoriesView(private val service: CategoryService) : VerticalLayout() {
             .apply {
                 setAriaLabel("Edit")
                 setTooltipText("Edit")
+                addThemeVariants(ButtonVariant.TERTIARY)
             },
         Button(VaadinIcon.CLOSE.create().apply { setSize(ACTION_ICON_SIZE) }) { confirmDelete(category) }
             .apply {
                 setAriaLabel("Delete")
                 setTooltipText("Delete")
+                addThemeVariants(ButtonVariant.ERROR, ButtonVariant.TERTIARY)
             }
-    )
+    ).apply {
+        setSpacing(false)
+        addClassName("category-actions")
+    }
 
     private fun openForm(category: Category? = null) {
         val dialog = CategoryFormDialog(service.findAll(), category, ::saveCategory)
@@ -95,17 +106,17 @@ class CategoriesView(private val service: CategoryService) : VerticalLayout() {
     }
 
     private fun confirmDelete(category: Category) {
-        val dialog = Dialog()
-        dialog.add(
-            Paragraph("Delete category '${category.description}'?"),
-            HorizontalLayout(
-                Button("Cancel") { dialog.close() },
-                Button("Delete") {
-                    deleteCategory(category)
-                    dialog.close()
-                }
+        val dialog = ConfirmDialog().apply {
+            setHeader("Delete category?")
+            setText(
+                "Delete '${category.description}'? Categories used by statements or with subcategories cannot be deleted."
             )
-        )
+            setCancelable(true)
+            setCancelText("Cancel")
+            setConfirmText("Delete")
+            setConfirmButtonTheme("error primary")
+            addConfirmListener { deleteCategory(category) }
+        }
         dialog.open()
     }
 
@@ -128,10 +139,9 @@ class CategoriesView(private val service: CategoryService) : VerticalLayout() {
         val childrenByRoot = categories.filter { it.rootCategory != null }.groupBy { it.rootCategory }
         val roots = categories.filter { it.rootCategory == null }
         grid.setItems(roots) { category -> childrenByRoot[category].orEmpty() }
-        grid.expandRecursively(roots, categories.size)
     }
 
     private companion object {
-        const val ACTION_ICON_SIZE = "14px"
+        const val ACTION_ICON_SIZE = "16px"
     }
 }

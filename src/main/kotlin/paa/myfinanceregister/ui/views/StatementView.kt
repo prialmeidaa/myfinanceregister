@@ -1,6 +1,7 @@
 package paa.myfinanceregister.ui.views
 
 import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.button.ButtonVariant
 import com.vaadin.flow.component.dependency.CssImport
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.grid.Grid
@@ -18,12 +19,14 @@ import paa.myfinanceregister.services.StatementService
 import paa.myfinanceregister.ui.components.AppNotification
 import paa.myfinanceregister.ui.components.StatementFormDialog
 import paa.myfinanceregister.ui.components.StatementMonthFilter
+import paa.myfinanceregister.ui.components.ViewTitle
 import paa.myfinanceregister.ui.layout.MainLayout
 
 @Route(value = "statement", layout = MainLayout::class)
 @PageTitle("Statement")
 @PermitAll
 @CssImport("./styles/statement-view.css")
+@CssImport("./styles/view-title.css")
 class StatementView(
     private val service: StatementService,
     private val categoryService: CategoryService,
@@ -42,9 +45,17 @@ class StatementView(
                 ::saveStatement
             )
         )
-        val actions = HorizontalLayout(monthFilter, Button("New statement") { openForm() }).apply {
+        val title = ViewTitle("Statement")
+        val actions = HorizontalLayout(
+            title,
+            monthFilter,
+            Button("New statement") { openForm() }.apply {
+                addThemeVariants(ButtonVariant.PRIMARY)
+            }
+        ).apply {
             setWidthFull()
-            setFlexGrow(1.0, monthFilter)
+            setFlexGrow(1.0, title)
+            addClassName("view-header")
         }
         add(actions, grid)
         refreshGrid()

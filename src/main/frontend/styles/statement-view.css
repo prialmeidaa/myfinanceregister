@@ -11,7 +11,7 @@ vaadin-grid::part(statement-total-label) {
 }
 
 vaadin-grid::part(statement-amount-positive) {
-  color: var(--aura-blue-text);
+  color: var(--aura-green-text);
 }
 
 vaadin-grid::part(statement-amount-negative) {
@@ -24,14 +24,14 @@ vaadin-grid::part(statement-amount-neutral) {
 
 .statement-inline-editor {
   box-sizing: border-box;
-  padding: var(--lumo-space-m);
+  padding: var(--vaadin-gap-m);
   border: 1px solid var(--vaadin-border-color-secondary);
-  border-radius: var(--lumo-border-radius-m);
+  border-radius: var(--vaadin-radius-m);
   background: var(--vaadin-background-container);
 }
 
 .statement-inline-editor-row {
-  gap: var(--lumo-space-m);
+  gap: var(--vaadin-gap-m);
 }
 
 .statement-inline-editor-primary-row > vaadin-date-picker,

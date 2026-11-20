@@ -1,0 +1,46 @@
+.accounts-view {
+  gap: var(--vaadin-gap-m);
+  box-sizing: border-box;
+}
+
+.account-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
+  box-sizing: border-box;
+  padding-inline: var(--vaadin-gap-s);
+  border: 1px solid var(--vaadin-border-color-secondary);
+  border-radius: var(--vaadin-radius-m);
+  font-size: var(--aura-font-size-s);
+  font-weight: var(--aura-font-weight-semibold);
+}
+
+.account-status-active {
+  display: inline-flex;
+  align-items: center;
+  color: var(--aura-green-text);
+  background: var(--aura-green-light);
+}
+
+.account-status-inactive {
+  color: var(--vaadin-text-color-secondary);
+  background: var(--vaadin-background-container);
+}
+
+.account-status::before {
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-inline-end: var(--vaadin-gap-xs);
+  border-radius: 50%;
+  background: currentColor;
+  content: "";
+}
+
+.account-status-inactive::before {
+  opacity: 0.55;
+}
+
+.account-actions {
+  gap: var(--vaadin-gap-xs);
+  align-items: center;
+}

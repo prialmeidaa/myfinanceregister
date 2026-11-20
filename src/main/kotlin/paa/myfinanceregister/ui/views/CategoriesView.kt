@@ -2,6 +2,8 @@ package paa.myfinanceregister.ui.views
 
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.button.ButtonVariant
+import com.vaadin.flow.component.dependency.CssImport
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.grid.ColumnTextAlign
 import com.vaadin.flow.component.html.Span
@@ -18,19 +20,29 @@ import paa.myfinanceregister.domain.model.Category
 import paa.myfinanceregister.services.CategoryService
 import paa.myfinanceregister.ui.components.AppNotification
 import paa.myfinanceregister.ui.components.CategoryFormDialog
+import paa.myfinanceregister.ui.components.ViewTitle
 import paa.myfinanceregister.ui.layout.MainLayout
 
 @Route(value = "categories", layout = MainLayout::class)
 @PageTitle("Categories")
 @PermitAll
+@CssImport("./styles/view-title.css")
 class CategoriesView(private val service: CategoryService) : VerticalLayout() {
     private val grid = TreeGrid<Category>()
 
     init {
         configureGrid()
-        val actions = HorizontalLayout(Button("New category") { openForm() }).apply {
+        val title = ViewTitle("Categories")
+        val actions = HorizontalLayout(
+            title,
+            Button("New category") { openForm() }.apply {
+                addThemeVariants(ButtonVariant.PRIMARY)
+            }
+        ).apply {
             setWidthFull()
             justifyContentMode = FlexComponent.JustifyContentMode.END
+            setFlexGrow(1.0, title)
+            addClassName("view-header")
         }
         add(actions, grid)
         refreshGrid()

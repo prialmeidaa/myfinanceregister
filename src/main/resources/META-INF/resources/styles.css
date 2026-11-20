@@ -1,0 +1,24 @@
+html {
+  --aura-accent-color-dark: #63A7A2;
+  --aura-accent-color-light: #087F83;
+  --aura-blue: #65778A;
+  --aura-neutral-dark: #D6E0E2;
+  --aura-neutral-light: #3D4C57;
+}
+
+vaadin-side-nav-item:not([current]) > vaadin-icon {
+  color: var(--aura-accent-text-color);
+}
+
+vaadin-side-nav-item[current]::part(content) {
+  --vaadin-side-nav-item-background: var(--aura-accent-surface);
+  --vaadin-side-nav-item-border-color: transparent;
+}
+
+:is(vaadin-button, vaadin-menu-bar-button, vaadin-upload-button):not([theme~="primary"], [theme~="tertiary"]) {
+  --aura-accent-color-light: var(--aura-neutral);
+  --aura-accent-color-dark: var(--aura-neutral);
+  --vaadin-button-background: var(--vaadin-background-container);
+  --vaadin-button-border-color: transparent;
+  --vaadin-button-shadow: none;
+}

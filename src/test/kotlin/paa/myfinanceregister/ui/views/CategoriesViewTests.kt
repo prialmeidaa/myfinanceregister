@@ -1,6 +1,7 @@
 package paa.myfinanceregister.ui.views
 
 import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.button.ButtonVariant
 import com.vaadin.flow.component.grid.ColumnTextAlign
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.Icon
@@ -19,6 +20,7 @@ import org.mockito.Mockito
 import paa.myfinanceregister.domain.model.Category
 import paa.myfinanceregister.services.CategoryService
 import paa.myfinanceregister.ui.layout.MainLayout
+import paa.myfinanceregister.ui.components.ViewTitle
 
 class CategoriesViewTests {
     @Test
@@ -48,8 +50,11 @@ class CategoriesViewTests {
 
         assertThat(actions.width).isEqualTo("100%")
         assertThat(actions.justifyContentMode).isEqualTo(FlexComponent.JustifyContentMode.END)
-        assertThat(actions.children.toList().filterIsInstance<Button>().single().text)
-            .isEqualTo("New category")
+        assertThat(actions.children.toList().filterIsInstance<ViewTitle>().single().text)
+            .isEqualTo("Categories")
+        val newCategoryButton = actions.children.toList().filterIsInstance<Button>().single()
+        assertThat(newCategoryButton.text).isEqualTo("New category")
+        assertThat(newCategoryButton.themeNames).contains(ButtonVariant.PRIMARY.variantName)
     }
 
     @Test

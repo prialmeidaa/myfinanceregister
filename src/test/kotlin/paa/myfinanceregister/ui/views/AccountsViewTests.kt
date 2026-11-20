@@ -1,7 +1,9 @@
 package paa.myfinanceregister.ui.views
 
 import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.button.ButtonVariant
 import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.grid.GridVariant
 import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.notification.Notification
@@ -16,6 +18,8 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import paa.myfinanceregister.domain.model.Account
 import paa.myfinanceregister.services.AccountService
+import paa.myfinanceregister.ui.components.AccountStatusBadge
+import paa.myfinanceregister.ui.components.ViewTitle
 import paa.myfinanceregister.ui.layout.MainLayout
 
 class AccountsViewTests {
@@ -28,11 +32,15 @@ class AccountsViewTests {
         val title = AccountsView::class.java.getAnnotation(PageTitle::class.java)
         val grid = view.children.toList().filterIsInstance<Grid<Account>>().single()
 
+        assertThat(view.isPadding).isTrue()
+        assertThat(view.isSpacing).isTrue()
         assertThat(route.value).isEqualTo("accounts")
         assertThat(route.layout.java).isEqualTo(MainLayout::class.java)
         assertThat(title.value).isEqualTo("Accounts")
         assertThat(AccountsView::class.java.isAnnotationPresent(PermitAll::class.java)).isTrue()
         assertThat(grid.dataProvider.isInMemory).isTrue()
+        assertThat(grid.themeNames)
+            .contains(GridVariant.NO_BORDER.variantName, GridVariant.ROW_STRIPES.variantName)
         Mockito.verify(service).findAll()
     }
 
@@ -43,8 +51,11 @@ class AccountsViewTests {
 
         assertThat(actions.width).isEqualTo("100%")
         assertThat(actions.justifyContentMode).isEqualTo(FlexComponent.JustifyContentMode.END)
-        assertThat(actions.children.toList().filterIsInstance<Button>().single().text)
-            .isEqualTo("New account")
+        assertThat(actions.children.toList().filterIsInstance<ViewTitle>().single().text)
+            .isEqualTo("Accounts")
+        val newAccountButton = actions.children.toList().filterIsInstance<Button>().single()
+        assertThat(newAccountButton.text).isEqualTo("New account")
+        assertThat(newAccountButton.themeNames).contains(ButtonVariant.PRIMARY.variantName)
     }
 
     @Test
@@ -68,11 +79,29 @@ class AccountsViewTests {
         assertThat(activeButtons.map { (it.icon as Icon).icon })
             .containsExactly(VaadinIcon.PENCIL.create().icon, VaadinIcon.BAN.create().icon)
         assertThat(activeButtons.map { (it.icon as Icon).element.style.get("width") })
-            .containsExactly("14px", "14px")
+            .containsExactly("16px", "16px")
         assertThat(inactiveButtons.map { it.ariaLabel.orElse("") }).containsExactly("Edit", "Activate")
         assertThat(inactiveButtons.map { it.tooltip.text }).containsExactly("Edit", "Activate")
         assertThat(inactiveButtons.map { (it.icon as Icon).icon })
             .containsExactly(VaadinIcon.PENCIL.create().icon, VaadinIcon.CHECK.create().icon)
+    }
+
+    @Test
+    fun accountStatusIsRenderedAsActiveOrInactiveBadge() {
+        val grid = AccountsView(Mockito.mock(AccountService::class.java)).children
+            .toList()
+            .filterIsInstance<Grid<Account>>()
+            .single()
+        val statusColumn = grid.columns.last()
+        val renderer = statusColumn.renderer as ComponentRenderer<AccountStatusBadge, Account>
+
+        val activeBadge = renderer.createComponent(Account(1, "Checking"))
+        val inactiveBadge = renderer.createComponent(Account(2, "Savings", active = false))
+
+        assertThat(activeBadge.text).isEqualTo("Active")
+        assertThat(activeBadge.classNames).contains("account-status", "account-status-active")
+        assertThat(inactiveBadge.text).isEqualTo("Inactive")
+        assertThat(inactiveBadge.classNames).contains("account-status", "account-status-inactive")
     }
 
     @Test

@@ -29,18 +29,9 @@ class MainLayoutTests {
         assertThat(components.filterIsInstance<Hr>())
             .singleElement()
             .extracting { it.element.style.get("margin-inline") }
-            .isEqualTo("var(--lumo-space-m)")
+            .isEqualTo("var(--vaadin-gap-m)")
         assertThat(components.filterIsInstance<MainMenu>()).hasSize(1)
         assertThat(MainLayout::class.java.isAnnotationPresent(AnonymousAllowed::class.java)).isTrue()
-    }
-
-    @Test
-    fun mainLayoutUpdatesNavbarTitleWhenPageTitleChanges() {
-        val layout = MainLayout()
-
-        layout.updateCurrentPageTitle("Accounts")
-
-        assertThat(descendants(layout).filterIsInstance<H1>().single().text).isEqualTo("Accounts")
     }
 
     private fun descendants(component: Component): List<Component> =

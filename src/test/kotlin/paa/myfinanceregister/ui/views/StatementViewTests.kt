@@ -21,6 +21,7 @@ import paa.myfinanceregister.services.AccountService
 import paa.myfinanceregister.services.CategoryService
 import paa.myfinanceregister.services.StatementService
 import paa.myfinanceregister.ui.components.StatementMonthFilter
+import paa.myfinanceregister.ui.components.ViewTitle
 import paa.myfinanceregister.ui.layout.MainLayout
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -34,7 +35,9 @@ class StatementViewTests {
         val actionComponents = actions.children.toList()
 
         assertThat(actions.width).isEqualTo("100%")
-        assertThat(actionComponents.first()).isInstanceOf(StatementMonthFilter::class.java)
+        assertThat(actionComponents.first()).isInstanceOf(ViewTitle::class.java)
+        assertThat((actionComponents.first() as ViewTitle).text).isEqualTo("Statement")
+        assertThat(actionComponents[1]).isInstanceOf(StatementMonthFilter::class.java)
         assertThat(actionComponents.last()).isInstanceOf(Button::class.java)
         assertThat((actionComponents.last() as Button).text).isEqualTo("New statement")
         assertThat(actions.getFlexGrow(actionComponents.first())).isEqualTo(1.0)
@@ -51,14 +54,14 @@ class StatementViewTests {
         val view = createView(service)
         val route = StatementView::class.java.getAnnotation(Route::class.java)
         val title = StatementView::class.java.getAnnotation(PageTitle::class.java)
-        val cssImport = StatementView::class.java.getAnnotation(CssImport::class.java)
+        val cssImports = StatementView::class.java.getAnnotationsByType(CssImport::class.java)
         val grid = view.children.toList().filterIsInstance<Grid<StatementGridRow>>().single()
 
         assertThat(route.value).isEqualTo("statement")
         assertThat(route.layout.java).isEqualTo(MainLayout::class.java)
         assertThat(title.value).isEqualTo("Statement")
-        assertThat(cssImport.value).isEqualTo("./styles/statement-view.css")
-        assertThat(cssImport.themeFor).isEmpty()
+        assertThat(cssImports.map { it.value })
+            .containsExactly("./styles/statement-view.css", "./styles/view-title.css")
         assertThat(StatementView::class.java.isAnnotationPresent(PermitAll::class.java)).isTrue()
         assertThat(grid.dataProvider.fetch(Query()).toList().mapNotNull { it.statement })
             .containsExactlyElementsOf(statements.reversed())

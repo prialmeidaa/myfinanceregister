@@ -32,7 +32,7 @@ class Statement(
     var id: Long? = null,
     @Column(nullable = false)
     var date: LocalDate = LocalDate.now(),
-    @Column(nullable = false)
+    @Column(nullable = false, length = MAX_DESCRIPTION_LENGTH)
     var description: String = "",
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
@@ -53,4 +53,8 @@ class Statement(
     var seriesId: String? = null,
     var seriesIndex: Int? = null,
     var seriesCount: Int? = null
-)
+) {
+    companion object {
+        const val MAX_DESCRIPTION_LENGTH = 100
+    }
+}

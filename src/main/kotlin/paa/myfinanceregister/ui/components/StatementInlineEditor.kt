@@ -29,6 +29,8 @@ class StatementInlineEditor(
     }
     private val descriptionField = TextField("Description").apply {
         isRequired = true
+        setMaxLength(Statement.MAX_DESCRIPTION_LENGTH)
+        setMaxWidth(DESCRIPTION_FIELD_MAX_WIDTH)
         value = statement.description
     }
     private val financialFields = StatementFinancialFields(categories, accounts, statement)
@@ -96,6 +98,7 @@ class StatementInlineEditor(
 
     private companion object {
         const val DATE_FORMAT = "dd/MM/yyyy"
+        const val DESCRIPTION_FIELD_MAX_WIDTH = "24rem"
         val BRAZILIAN_LOCALE: Locale = Locale.forLanguageTag("pt-BR")
     }
 }

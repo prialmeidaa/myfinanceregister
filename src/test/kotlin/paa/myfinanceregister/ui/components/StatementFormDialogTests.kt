@@ -19,6 +19,14 @@ import java.time.LocalDate
 
 class StatementFormDialogTests {
     @Test
+    fun descriptionFieldLimitsInputToOneHundredCharacters() {
+        val dialog = StatementFormDialog(emptyList(), emptyList(), null) { _, _ -> false }
+        val descriptionField = descendants(dialog).filterIsInstance<TextField>().single()
+
+        assertThat(descriptionField.maxLength).isEqualTo(Statement.MAX_DESCRIPTION_LENGTH)
+    }
+
+    @Test
     fun newDialogOnlyShowsActiveAccounts() {
         val activeAccount = Account(1, "Checking")
         val inactiveAccount = Account(2, "Old account", active = false)

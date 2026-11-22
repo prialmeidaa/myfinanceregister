@@ -21,6 +21,24 @@ import java.time.LocalDate
 
 class StatementInlineEditorTests {
     @Test
+    fun descriptionFieldLimitsInputToOneHundredCharacters() {
+        val editor = StatementInlineEditor(emptyList(), emptyList(), statement(), { _, _ -> false }, {})
+        val descriptionField = descendants(editor).filterIsInstance<TextField>()
+            .single { it.label == "Description" }
+
+        assertThat(descriptionField.maxLength).isEqualTo(Statement.MAX_DESCRIPTION_LENGTH)
+    }
+
+    @Test
+    fun descriptionFieldHasLimitedVisualWidth() {
+        val editor = StatementInlineEditor(emptyList(), emptyList(), statement(), { _, _ -> false }, {})
+        val descriptionField = descendants(editor).filterIsInstance<TextField>()
+            .single { it.label == "Description" }
+
+        assertThat(descriptionField.maxWidth).isEqualTo("24rem")
+    }
+
+    @Test
     fun saveSubmitsTheStatementAndEnteredValues() {
         val category = Category(1, "Food")
         val account = Account(2, "Checking")

@@ -27,6 +27,7 @@ class StatementFormDialog(
     }
     private val descriptionField = TextField("Description").apply {
         isRequired = true
+        setMaxLength(Statement.MAX_DESCRIPTION_LENGTH)
         value = statement?.description.orEmpty()
     }
     private val financialFields = StatementFinancialFields(

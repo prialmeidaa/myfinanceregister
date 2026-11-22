@@ -11,8 +11,12 @@ class Account(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
-    @Column(nullable = false)
+    @Column(nullable = false, length = MAX_DESCRIPTION_LENGTH)
     var description: String = "",
     @Column(nullable = false)
     var active: Boolean = true
-)
+) {
+    companion object {
+        const val MAX_DESCRIPTION_LENGTH = 50
+    }
+}

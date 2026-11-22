@@ -28,12 +28,14 @@ class StatementFormDialog(
     private val descriptionField = TextField("Description").apply {
         isRequired = true
         setMaxLength(Statement.MAX_DESCRIPTION_LENGTH)
+        setMaxWidth(DESCRIPTION_FIELD_MAX_WIDTH)
         value = statement?.description.orEmpty()
     }
     private val financialFields = StatementFinancialFields(
         categories,
         if (statement == null) accounts.filter { it.active } else accounts,
-        statement
+        statement,
+        includeSelectionFields = true
     )
     private val amountField = BigDecimalField("Amount").apply {
         locale = BRAZILIAN_LOCALE
@@ -79,6 +81,7 @@ class StatementFormDialog(
 
     private companion object {
         const val DATE_FORMAT = "dd/MM/yyyy"
+        const val DESCRIPTION_FIELD_MAX_WIDTH = "24rem"
         val BRAZILIAN_LOCALE: Locale = Locale.forLanguageTag("pt-BR")
     }
 }

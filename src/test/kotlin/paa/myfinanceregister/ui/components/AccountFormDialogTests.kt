@@ -20,7 +20,10 @@ class AccountFormDialogTests {
         }
         val components = descendants(dialog)
 
-        assertThat(components.filterIsInstance<TextField>().single().value).isEqualTo("Checking")
+        val descriptionField = components.filterIsInstance<TextField>().single()
+        assertThat(descriptionField.value).isEqualTo("Checking")
+        assertThat(descriptionField.maxLength).isEqualTo(Account.MAX_DESCRIPTION_LENGTH)
+        assertThat(descriptionField.maxWidth).isEqualTo("24rem")
         components.filterIsInstance<Button>().single { it.text == "Save" }.click()
 
         assertThat(submittedId).isEqualTo(4)

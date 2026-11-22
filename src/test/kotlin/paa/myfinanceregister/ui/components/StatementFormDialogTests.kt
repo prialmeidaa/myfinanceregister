@@ -24,6 +24,24 @@ class StatementFormDialogTests {
         val descriptionField = descendants(dialog).filterIsInstance<TextField>().single()
 
         assertThat(descriptionField.maxLength).isEqualTo(Statement.MAX_DESCRIPTION_LENGTH)
+        assertThat(descriptionField.maxWidth).isEqualTo("24rem")
+    }
+
+    @Test
+    fun statementSelectionFieldsUseLimitedVisualWidth() {
+        val dialog = StatementFormDialog(
+            listOf(Category(1, "Food")),
+            listOf(Account(2, "Checking"), Account(3, "Savings")),
+            null
+        ) { _, _ -> false }
+        val components = descendants(dialog)
+
+        assertThat(components.filterIsInstance<ComboBox<Category>>()
+            .single { it.label == "Category" }.maxWidth)
+            .isEqualTo("24rem")
+        components.filterIsInstance<ComboBox<Account>>().forEach {
+            assertThat(it.maxWidth).isEqualTo("24rem")
+        }
     }
 
     @Test

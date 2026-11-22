@@ -18,7 +18,8 @@ internal data class StatementFinancialSelection(
 internal class StatementFinancialFields(
     categories: List<Category>,
     accounts: List<Account>,
-    statement: Statement?
+    statement: Statement?,
+    private val includeSelectionFields: Boolean = false
 ) : VerticalLayout() {
     private val kindField = RadioButtonGroup<StatementKind>("Transaction type").apply {
         setItems(StatementKind.entries)
@@ -33,24 +34,31 @@ internal class StatementFinancialFields(
     }
     internal val categoryField = ComboBox<Category>("Category").apply {
         isRequired = true
+        setMaxWidth(SELECTION_FIELD_MAX_WIDTH)
         setItemLabelGenerator { it.description }
         setItems(categories)
         value = categories.firstOrNull { it.id == statement?.category?.id }
     }
     internal val accountField = ComboBox<Account>("Account").apply {
         isRequired = true
+        setMaxWidth(SELECTION_FIELD_MAX_WIDTH)
         setItemLabelGenerator { it.description }
         setItems(accounts)
         value = accounts.firstOrNull { it.id == statement?.account?.id }
     }
     private val destinationAccountField = ComboBox<Account>("Destination account").apply {
         isRequired = true
+        setMaxWidth(SELECTION_FIELD_MAX_WIDTH)
         setItemLabelGenerator { it.description }
         setItems(accounts)
         value = accounts.firstOrNull { it.id == statement?.destinationAccount?.id }
     }
     init {
-        add(kindField, destinationAccountField)
+        if (includeSelectionFields) {
+            add(kindField, categoryField, accountField, destinationAccountField)
+        } else {
+            add(kindField, destinationAccountField)
+        }
         setWidthFull()
         setPadding(false)
         kindField.addValueChangeListener { updateVisibility() }
@@ -70,5 +78,9 @@ internal class StatementFinancialFields(
         categoryField.isRequired = !isTransfer
         accountField.label = if (isTransfer) "Origin account" else "Account"
         destinationAccountField.isVisible = isTransfer
+    }
+
+    private companion object {
+        const val SELECTION_FIELD_MAX_WIDTH = "24rem"
     }
 }

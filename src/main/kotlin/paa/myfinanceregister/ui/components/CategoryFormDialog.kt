@@ -17,6 +17,8 @@ class CategoryFormDialog(
     private val rootCategoryId = category?.rootCategory?.id
     private val descriptionField = TextField("Description").apply {
         isRequired = true
+        setMaxLength(Category.MAX_DESCRIPTION_LENGTH)
+        setMaxWidth(DESCRIPTION_FIELD_MAX_WIDTH)
         value = category?.description.orEmpty()
     }
     private val rootCategoryField = ComboBox<Category>("Root category").apply {
@@ -56,5 +58,9 @@ class CategoryFormDialog(
             current = current.rootCategory
         }
         return false
+    }
+
+    private companion object {
+        const val DESCRIPTION_FIELD_MAX_WIDTH = "24rem"
     }
 }

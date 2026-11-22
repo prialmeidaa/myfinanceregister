@@ -18,7 +18,10 @@ class CategoryFormDialogTests {
         val components = descendants(dialog)
         val rootField = components.filterIsInstance<ComboBox<*>>().single()
 
-        assertThat(components.filterIsInstance<TextField>().single().value).isEqualTo("Food")
+        val descriptionField = components.filterIsInstance<TextField>().single()
+        assertThat(descriptionField.value).isEqualTo("Food")
+        assertThat(descriptionField.maxLength).isEqualTo(Category.MAX_DESCRIPTION_LENGTH)
+        assertThat(descriptionField.maxWidth).isEqualTo("24rem")
         assertThat(rootField.value).isSameAs(root)
         assertThat(components.filterIsInstance<Button>().map { it.text }).containsExactly("Cancel", "Save")
         assertThat(rootField.helperText).isEqualTo("Leave empty for a top-level category.")

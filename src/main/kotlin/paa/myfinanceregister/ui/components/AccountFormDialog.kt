@@ -13,6 +13,8 @@ class AccountFormDialog(
 ) : Dialog() {
     private val descriptionField = TextField("Description").apply {
         isRequired = true
+        setMaxLength(Account.MAX_DESCRIPTION_LENGTH)
+        setMaxWidth(DESCRIPTION_FIELD_MAX_WIDTH)
         value = account?.description.orEmpty()
     }
 
@@ -32,5 +34,9 @@ class AccountFormDialog(
     private fun save(account: Account?) {
         val saved = onSave(account?.id, descriptionField.value)
         if (saved) close()
+    }
+
+    private companion object {
+        const val DESCRIPTION_FIELD_MAX_WIDTH = "24rem"
     }
 }

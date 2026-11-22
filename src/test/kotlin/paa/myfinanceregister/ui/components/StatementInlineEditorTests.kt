@@ -39,6 +39,25 @@ class StatementInlineEditorTests {
     }
 
     @Test
+    fun inlineSelectionFieldsUseLimitedVisualWidth() {
+        val editor = StatementInlineEditor(
+            listOf(Category(1, "Food")),
+            listOf(Account(2, "Checking")),
+            statement(),
+            { _, _ -> false },
+            {}
+        )
+        val components = descendants(editor)
+
+        assertThat(components.filterIsInstance<ComboBox<Category>>()
+            .single { it.label == "Category" }.maxWidth)
+            .isEqualTo("24rem")
+        components.filterIsInstance<ComboBox<Account>>().forEach {
+            assertThat(it.maxWidth).isEqualTo("24rem")
+        }
+    }
+
+    @Test
     fun saveSubmitsTheStatementAndEnteredValues() {
         val category = Category(1, "Food")
         val account = Account(2, "Checking")

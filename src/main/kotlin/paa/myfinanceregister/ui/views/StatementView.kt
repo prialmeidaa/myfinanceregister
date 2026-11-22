@@ -2,6 +2,7 @@ package paa.myfinanceregister.ui.views
 
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.button.ButtonVariant
+import com.vaadin.flow.component.combobox.MultiSelectComboBox
 import com.vaadin.flow.component.dependency.CssImport
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.grid.Grid
@@ -12,6 +13,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
 import jakarta.annotation.security.PermitAll
+import paa.myfinanceregister.domain.model.Account
+import paa.myfinanceregister.domain.model.Category
 import paa.myfinanceregister.domain.model.Statement
 import paa.myfinanceregister.services.AccountService
 import paa.myfinanceregister.services.CategoryService
@@ -35,21 +38,36 @@ class StatementView(
 ) : VerticalLayout() {
     private val grid = Grid<StatementGridRow>()
     private val monthFilter = StatementMonthFilter(::refreshGrid)
+    private val categories = categoryService.findAll()
+    private val accounts = accountService.findAll()
+    private val categoryFilter = MultiSelectComboBox<Category>("Category").apply {
+        setItems(categories)
+        setItemLabelGenerator { it.description }
+        placeholder = "All categories"
+        setClearButtonVisible(true)
+        addValueChangeListener { refreshGrid() }
+    }
+    private val accountFilter = MultiSelectComboBox<Account>("Account").apply {
+        setItems(accounts)
+        setItemLabelGenerator { it.description }
+        placeholder = "All accounts"
+        setClearButtonVisible(true)
+        addValueChangeListener { refreshGrid() }
+    }
 
     init {
         StatementGridStyling.configure(grid, ::toggleInlineEditor, ::confirmDelete)
         StatementGridDetails.configure(
             grid,
             StatementGridDetailsConfiguration(
-                categoryService.findAll(),
-                accountService.findAll(),
+                categories,
+                accounts,
                 ::saveStatement
             )
         )
         val title = ViewTitle("Statement")
         val actions = HorizontalLayout(
             title,
-            monthFilter,
             Button("New statement") { openForm() }.apply {
                 addThemeVariants(ButtonVariant.PRIMARY)
             }
@@ -60,7 +78,12 @@ class StatementView(
             setFlexGrow(1.0, title)
             addClassName("view-header")
         }
-        add(actions, grid)
+        val filters = HorizontalLayout(monthFilter, categoryFilter, accountFilter).apply {
+            setWidthFull()
+            setWrap(true)
+            setAlignItems(FlexComponent.Alignment.CENTER)
+        }
+        add(actions, filters, grid)
         refreshGrid()
     }
 
@@ -127,6 +150,34 @@ class StatementView(
     private fun refreshGrid() {
         val statements = service.findAll()
         monthFilter.updateMonths(statements)
-        grid.setItems(StatementGridRowFactory.create(monthFilter.filter(statements)))
+        val filteredStatements = statements.filterByCategory().filterByAccount()
+        grid.setItems(StatementGridRowFactory.create(monthFilter.filter(filteredStatements)))
+    }
+
+    private fun List<Statement>.filterByCategory(): List<Statement> {
+        val selectedCategoryIds = categoryFilter.value.mapNotNull { it.id }.toMutableSet()
+        if (selectedCategoryIds.isEmpty()) return this
+        addDescendantCategoryIds(selectedCategoryIds)
+        return filter { statement ->
+            statement.category?.id in selectedCategoryIds
+        }
+    }
+
+    private fun List<Statement>.filterByAccount(): List<Statement> {
+        val selectedAccountIds = accountFilter.value.mapNotNull { it.id }.toSet()
+        if (selectedAccountIds.isEmpty()) return this
+        return filter {
+            it.account.id in selectedAccountIds || it.destinationAccount?.id in selectedAccountIds
+        }
+    }
+
+    private fun addDescendantCategoryIds(selectedCategoryIds: MutableSet<Long>) {
+        var foundDescendant: Boolean
+        do {
+            val descendantIds = categories
+                .filter { it.rootCategory?.id in selectedCategoryIds }
+                .mapNotNull { it.id }
+            foundDescendant = selectedCategoryIds.addAll(descendantIds)
+        } while (foundDescendant)
     }
 }

@@ -4,6 +4,7 @@ import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.dependency.CssImport
 import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.combobox.MultiSelectComboBox
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.data.provider.Query
 import com.vaadin.flow.data.renderer.ComponentRenderer
@@ -29,25 +30,30 @@ import java.time.YearMonth
 
 class StatementViewTests {
     @Test
-    fun newStatementButtonIsAlignedToTheRightOfTheGrid() {
+    fun newStatementButtonAndFiltersOccupySeparateRows() {
         val view = createView(Mockito.mock(StatementService::class.java))
-        val actions = view.children.toList().filterIsInstance<HorizontalLayout>().single()
+        val rows = view.children.toList().filterIsInstance<HorizontalLayout>()
+        val actions = rows[0]
         val actionComponents = actions.children.toList()
+        val filterComponents = rows[1].children.toList()
 
         assertThat(actions.width).isEqualTo("100%")
         assertThat(actionComponents.first()).isInstanceOf(ViewTitle::class.java)
         assertThat((actionComponents.first() as ViewTitle).text).isEqualTo("Statement")
-        assertThat(actionComponents[1]).isInstanceOf(StatementMonthFilter::class.java)
         assertThat(actionComponents.last()).isInstanceOf(Button::class.java)
         assertThat((actionComponents.last() as Button).text).isEqualTo("New statement")
         assertThat(actions.getFlexGrow(actionComponents.first())).isEqualTo(1.0)
+        assertThat(filterComponents.filterIsInstance<StatementMonthFilter>()).hasSize(1)
+        assertThat(filterComponents.filterIsInstance<MultiSelectComboBox<*>>().map { it.label })
+            .contains("Category", "Account")
     }
 
     @Test
-    fun statementViewUsesSharedLayoutAndShowsAllStatementsInitially() {
+    fun statementViewUsesSharedLayoutAndShowsCurrentMonthInitially() {
+        val currentMonth = YearMonth.now()
         val statements = listOf(
-            statement(LocalDate.of(2026, 10, 5), "October"),
-            statement(LocalDate.of(2026, 9, 5), "September")
+            statement(currentMonth.atDay(5), "Current month"),
+            statement(currentMonth.minusMonths(1).atDay(5), "Previous month")
         )
         val service = Mockito.mock(StatementService::class.java)
         Mockito.`when`(service.findAll()).thenReturn(statements)
@@ -64,7 +70,68 @@ class StatementViewTests {
             .containsExactly("./styles/statement-view.css", "./styles/view-title.css")
         assertThat(StatementView::class.java.isAnnotationPresent(PermitAll::class.java)).isTrue()
         assertThat(grid.dataProvider.fetch(Query()).toList().mapNotNull { it.statement })
-            .containsExactlyElementsOf(statements.reversed())
+            .containsExactly(statements.first())
+    }
+
+    @Test
+    fun categoryFilterDefaultsToAllCategoriesAndFiltersStatements() {
+        val currentMonth = YearMonth.now()
+        val food = Category(1, "Food")
+        val groceries = Category(2, "Groceries", food)
+        val freshFood = Category(3, "Fresh food", groceries)
+        val income = Category(4, "Income")
+        val transport = Category(5, "Transport")
+        val statements = listOf(
+            statement(currentMonth.atDay(5), "Groceries", category = food),
+            statement(currentMonth.atDay(6), "Fresh food", category = freshFood),
+            statement(currentMonth.atDay(7), "Salary", category = income),
+            statement(currentMonth.atDay(8), "Bus", category = transport)
+        )
+        val service = Mockito.mock(StatementService::class.java)
+        Mockito.`when`(service.findAll()).thenReturn(statements)
+        val view = createView(service, categories = listOf(food, groceries, freshFood, income, transport))
+        val filter = view.children.toList().flatMap { it.children.toList() }
+            .filterIsInstance<MultiSelectComboBox<*>>().single { it.label == "Category" }
+
+        assertThat(filter.value).isEmpty()
+        val grid = view.children.toList().filterIsInstance<Grid<StatementGridRow>>().single()
+        assertThat(grid.dataProvider.fetch(Query()).toList().mapNotNull { it.statement })
+            .containsExactlyElementsOf(statements)
+
+        @Suppress("UNCHECKED_CAST")
+        (filter as MultiSelectComboBox<Category>).value = setOf(food, income)
+
+        assertThat(grid.dataProvider.fetch(Query()).toList().mapNotNull { it.statement })
+            .containsExactly(statements[0], statements[1], statements[2])
+    }
+
+    @Test
+    fun accountFilterDefaultsToAllAccountsAndIncludesMultipleAccountsAndTransfersToThem() {
+        val currentMonth = YearMonth.now()
+        val checking = Account(1, "Checking")
+        val savings = Account(2, "Savings")
+        val otherAccount = Account(3, "Other")
+        val transfer = statement(currentMonth.atDay(5), "Savings transfer", account = checking).apply {
+            kind = StatementKind.TRANSFER
+            destinationAccount = savings
+        }
+        val other = statement(currentMonth.atDay(8), "Other account", account = otherAccount)
+        val service = Mockito.mock(StatementService::class.java)
+        Mockito.`when`(service.findAll()).thenReturn(listOf(transfer, other))
+        val view = createView(service, accounts = listOf(checking, savings, otherAccount))
+        val filter = view.children.toList().flatMap { it.children.toList() }
+            .filterIsInstance<MultiSelectComboBox<*>>().single { it.label == "Account" }
+
+        assertThat(filter.value).isEmpty()
+        val grid = view.children.toList().filterIsInstance<Grid<StatementGridRow>>().single()
+        assertThat(grid.dataProvider.fetch(Query()).toList().mapNotNull { it.statement })
+            .containsExactlyElementsOf(listOf(transfer, other))
+
+        @Suppress("UNCHECKED_CAST")
+        (filter as MultiSelectComboBox<Account>).value = setOf(savings, otherAccount)
+
+        assertThat(grid.dataProvider.fetch(Query()).toList().mapNotNull { it.statement })
+            .containsExactly(transfer, other)
     }
 
     @Test
@@ -94,10 +161,11 @@ class StatementViewTests {
 
     @Test
     fun showsDailyBalancesIncludingNegativeStatements() {
+        val currentMonth = YearMonth.now()
         val statements = listOf(
-            statement(LocalDate.of(2026, 10, 5), "Purchase", "100.00"),
-            statement(LocalDate.of(2026, 10, 5), "Refund", "-25.00"),
-            statement(LocalDate.of(2026, 10, 8), "Another purchase", "10.00")
+            statement(currentMonth.atDay(5), "Purchase", "100.00"),
+            statement(currentMonth.atDay(5), "Refund", "-25.00"),
+            statement(currentMonth.atDay(8), "Another purchase", "10.00")
         )
         val service = Mockito.mock(StatementService::class.java)
         Mockito.`when`(service.findAll()).thenReturn(statements)
@@ -140,7 +208,7 @@ class StatementViewTests {
 
     @Test
     fun editActionOpensAndClosesInlineDetailsForAStatementRow() {
-        val statement = statement(LocalDate.of(2026, 10, 5), "Purchase")
+        val statement = statement(YearMonth.now().atDay(5), "Purchase")
         val service = Mockito.mock(StatementService::class.java)
         Mockito.`when`(service.findAll()).thenReturn(listOf(statement))
         val grid = createView(service).children.toList().filterIsInstance<Grid<StatementGridRow>>().single()
@@ -183,7 +251,7 @@ class StatementViewTests {
 
     @Test
     fun deleteStatementRemovesItAndRefreshesTheGrid() {
-        val statement = statement(LocalDate.of(2026, 10, 5), "Lunch").apply { id = 1 }
+        val statement = statement(YearMonth.now().atDay(5), "Lunch").apply { id = 1 }
         val service = Mockito.mock(StatementService::class.java)
         Mockito.`when`(service.findAll()).thenReturn(listOf(statement), emptyList())
         val view = createView(service)
@@ -204,17 +272,29 @@ class StatementViewTests {
         }
     }
 
-    private fun createView(service: StatementService) = StatementView(
-        service,
-        Mockito.mock(CategoryService::class.java),
-        Mockito.mock(AccountService::class.java)
-    )
+    private fun createView(
+        service: StatementService,
+        categories: List<Category> = emptyList(),
+        accounts: List<Account> = emptyList()
+    ): StatementView {
+        val categoryService = Mockito.mock(CategoryService::class.java)
+        val accountService = Mockito.mock(AccountService::class.java)
+        Mockito.`when`(categoryService.findAll()).thenReturn(categories)
+        Mockito.`when`(accountService.findAll()).thenReturn(accounts)
+        return StatementView(service, categoryService, accountService)
+    }
 
-    private fun statement(date: LocalDate, description: String, amount: String = "0.00") = Statement(
+    private fun statement(
+        date: LocalDate,
+        description: String,
+        amount: String = "0.00",
+        category: Category = Category(1, "Food"),
+        account: Account = Account(1, "Checking")
+    ) = Statement(
         date = date,
         description = description,
-        category = Category(1, "Food"),
-        account = Account(1, "Checking"),
+        category = category,
+        account = account,
         amount = BigDecimal(amount)
     )
 }

@@ -10,6 +10,16 @@ import java.time.YearMonth
 
 class StatementMonthFilterTests {
     @Test
+    fun defaultsToTheCurrentMonthEvenWhenThereAreNoStatementsInThatMonth() {
+        val statements = listOf(statement(YearMonth.now().minusMonths(1).atDay(5)))
+        val filter = StatementMonthFilter {}
+        filter.updateMonths(statements)
+
+        assertThat(filter.value).containsExactly(YearMonth.now())
+        assertThat(filter.filter(statements)).isEmpty()
+    }
+
+    @Test
     fun filtersByAllSelectedMonths() {
         val statements = listOf(
             statement(LocalDate.of(2026, 10, 5)),
@@ -27,6 +37,7 @@ class StatementMonthFilterTests {
     fun emptyMonthSelectionLeavesEveryStatementVisible() {
         val statements = listOf(statement(LocalDate.of(2026, 10, 5)))
         val filter = StatementMonthFilter {}
+        filter.value = emptySet()
 
         assertThat(filter.filter(statements)).containsExactlyElementsOf(statements)
     }

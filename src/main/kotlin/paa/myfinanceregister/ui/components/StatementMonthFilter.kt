@@ -15,12 +15,17 @@ class StatementMonthFilter(
         placeholder = "All months"
         setItemLabelGenerator { it.format(MONTH_FORMATTER) }
         setClearButtonVisible(true)
+        val currentMonth = YearMonth.now()
+        setItems(currentMonth)
+        value = setOf(currentMonth)
         addValueChangeListener { if (!updatingOptions) onSelectionChange() }
     }
 
     fun updateMonths(statements: List<Statement>) {
         val selectedMonths = value
-        val months = statements.map { YearMonth.from(it.date) }.distinct().sortedDescending()
+        val months = (statements.map { YearMonth.from(it.date) } + YearMonth.now())
+            .distinct()
+            .sortedDescending()
         updatingOptions = true
         try {
             setItems(months)

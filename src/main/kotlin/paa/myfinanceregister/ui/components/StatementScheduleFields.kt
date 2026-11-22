@@ -38,6 +38,7 @@ internal class StatementScheduleFields(statement: Statement?) : VerticalLayout()
         Paragraph("Recurring transactions will continue through the end of the current year.")
     private val installmentFields = HorizontalLayout(installmentNumberField, installmentCountField).apply {
         setWidthFull()
+        setWrap(true)
         setFlexGrow(1.0, installmentNumberField, installmentCountField)
     }
 

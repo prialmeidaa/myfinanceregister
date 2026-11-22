@@ -24,7 +24,7 @@ vaadin-grid::part(statement-amount-neutral) {
 
 .statement-inline-editor {
   box-sizing: border-box;
-  padding: var(--vaadin-gap-m);
+  padding: var(--lumo-space-s) var(--lumo-space-m);
   border: 1px solid var(--vaadin-border-color-secondary);
   border-radius: var(--vaadin-radius-m);
   background: var(--vaadin-background-container);
@@ -32,6 +32,15 @@ vaadin-grid::part(statement-amount-neutral) {
 
 .statement-inline-editor-row {
   gap: var(--vaadin-gap-m);
+}
+
+.view-header {
+  gap: var(--lumo-space-s);
+  margin-bottom: var(--lumo-space-s);
+}
+
+.view-header vaadin-multi-select-combo-box {
+  max-width: 14rem;
 }
 
 .statement-inline-editor-primary-row > vaadin-date-picker,

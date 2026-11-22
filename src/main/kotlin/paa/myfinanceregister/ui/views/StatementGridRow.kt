@@ -28,7 +28,7 @@ enum class StatementTotalType {
 
 object StatementGridRowFactory {
     fun formatAmount(amount: BigDecimal): String =
-        NumberFormat.getNumberInstance(BRAZILIAN_LOCALE).apply {
+        (if (amount.signum() > 0) "+" else "") + NumberFormat.getNumberInstance(BRAZILIAN_LOCALE).apply {
             minimumFractionDigits = 2
             maximumFractionDigits = 2
         }.format(amount)

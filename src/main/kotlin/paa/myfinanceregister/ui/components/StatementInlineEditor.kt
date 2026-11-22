@@ -1,6 +1,7 @@
 package paa.myfinanceregister.ui.components
 
 import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.button.ButtonVariant
 import com.vaadin.flow.component.datepicker.DatePicker
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
@@ -40,19 +41,25 @@ class StatementInlineEditor(
     private val scheduleFields = StatementScheduleFields(statement)
     private val primaryFields = HorizontalLayout(dateField, descriptionField, amountField).apply {
         setWidthFull()
+        setWrap(true)
         setFlexGrow(1.0, descriptionField)
         addClassName("statement-inline-editor-row")
         addClassName("statement-inline-editor-primary-row")
     }
     private val optionFields = HorizontalLayout(financialFields, scheduleFields).apply {
         setWidthFull()
+        setWrap(true)
         setFlexGrow(1.0, financialFields, scheduleFields)
         addClassName("statement-inline-editor-row")
         addClassName("statement-inline-editor-options-row")
     }
     private val actions = HorizontalLayout(
-        Button("Cancel", { onCancel() }),
-        Button("Save", { save() })
+        Button("Cancel", { onCancel() }).apply {
+            addThemeVariants(ButtonVariant.TERTIARY)
+        },
+        Button("Save", { save() }).apply {
+            addThemeVariants(ButtonVariant.PRIMARY)
+        }
     ).apply {
         setWidthFull()
         addClassName("statement-inline-editor-actions")

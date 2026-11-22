@@ -164,7 +164,7 @@ class StatementViewTests {
         assertThat(rows[1].date).isEmpty()
         assertThat(rows[1].description).isEmpty()
         assertThat(rows[1].account).isEqualTo("Daily balance")
-        assertThat(StatementGridRowFactory.formatAmount(rows.first().amount)).isEqualTo("1.234,50")
+        assertThat(StatementGridRowFactory.formatAmount(rows.first().amount)).isEqualTo("+1.234,50")
     }
 
     @Test

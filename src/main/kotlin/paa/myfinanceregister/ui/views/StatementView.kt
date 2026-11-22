@@ -7,6 +7,7 @@ import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.html.Paragraph
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
+import com.vaadin.flow.component.orderedlayout.FlexComponent
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
@@ -54,6 +55,8 @@ class StatementView(
             }
         ).apply {
             setWidthFull()
+            setWrap(true)
+            setAlignItems(FlexComponent.Alignment.CENTER)
             setFlexGrow(1.0, title)
             addClassName("view-header")
         }
@@ -91,13 +94,20 @@ class StatementView(
 
     private fun confirmDelete(statement: Statement) {
         val dialog = Dialog()
+        dialog.setHeaderTitle("Delete statement")
+        dialog.setCloseOnEsc(true)
+        dialog.setCloseOnOutsideClick(false)
         dialog.add(
-            Paragraph("Delete statement '${statement.description}'?"),
+            Paragraph("Delete '${statement.description}' from ${statement.date.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"))}?"),
             HorizontalLayout(
-                Button("Cancel") { dialog.close() },
+                Button("Cancel") { dialog.close() }.apply {
+                    addThemeVariants(ButtonVariant.TERTIARY)
+                },
                 Button("Delete") {
                     deleteStatement(statement)
                     dialog.close()
+                }.apply {
+                    addThemeVariants(ButtonVariant.ERROR)
                 }
             )
         )

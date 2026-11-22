@@ -1,6 +1,7 @@
 package paa.myfinanceregister.ui.views
 
 import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.button.ButtonVariant
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
@@ -39,18 +40,21 @@ internal object StatementGridStyling {
         onDelete: (Statement) -> Unit
     ): HorizontalLayout {
         val statement = requireNotNull(row.statement)
+        val description = statement.description
         return HorizontalLayout(
             Button(VaadinIcon.PENCIL.create().apply { setSize(ACTION_ICON_SIZE) }) { onEdit(row) }
                 .apply {
-                    setAriaLabel("Edit")
-                    setTooltipText("Edit")
+                    setAriaLabel("Edit $description")
+                    setTooltipText("Edit $description")
+                    addThemeVariants(ButtonVariant.TERTIARY, ButtonVariant.SMALL)
                 },
             Button(VaadinIcon.CLOSE.create().apply { setSize(ACTION_ICON_SIZE) }) { onDelete(statement) }
                 .apply {
-                    setAriaLabel("Delete")
-                    setTooltipText("Delete")
+                    setAriaLabel("Delete $description")
+                    setTooltipText("Delete $description")
+                    addThemeVariants(ButtonVariant.TERTIARY, ButtonVariant.SMALL)
                 }
-        )
+        ).apply { setSpacing(false) }
     }
 
     fun amountCellParts(row: StatementGridRow): String {

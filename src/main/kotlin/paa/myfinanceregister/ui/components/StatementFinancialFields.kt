@@ -52,6 +52,7 @@ internal class StatementFinancialFields(
     }
     private val accountFields = HorizontalLayout(categoryField, accountField, destinationAccountField).apply {
         setWidthFull()
+        setWrap(true)
         setFlexGrow(1.0, categoryField, accountField, destinationAccountField)
     }
 

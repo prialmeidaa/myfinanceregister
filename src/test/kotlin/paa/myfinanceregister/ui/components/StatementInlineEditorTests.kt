@@ -112,11 +112,13 @@ class StatementInlineEditorTests {
         val rows = editor.children.toList().filterIsInstance<HorizontalLayout>()
 
         assertThat(editor.classNames).contains("statement-inline-editor")
-        assertThat(rows).hasSize(3)
+        assertThat(rows).hasSize(4)
         assertThat(rows[0].classNames).contains("statement-inline-editor-primary-row")
-        assertThat(rows[1].classNames).contains("statement-inline-editor-options-row")
-        assertThat(rows[0].children.toList()).hasSize(3)
-        assertThat(rows[1].children.toList()).hasSize(2)
+        assertThat(rows[1].classNames).contains("statement-inline-editor-financial-row")
+        assertThat(rows[2].classNames).contains("statement-inline-editor-schedule-row")
+        assertThat(rows[3].classNames).contains("statement-inline-editor-actions")
+        assertThat(rows[0].children.toList()).hasSize(5)
+        assertThat(rows[2].children.toList()).hasSize(1)
     }
 
     @Test

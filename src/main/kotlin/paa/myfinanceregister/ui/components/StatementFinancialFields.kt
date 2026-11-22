@@ -1,7 +1,6 @@
 package paa.myfinanceregister.ui.components
 
 import com.vaadin.flow.component.combobox.ComboBox
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup
 import paa.myfinanceregister.domain.model.Account
@@ -32,13 +31,13 @@ internal class StatementFinancialFields(
         }
         value = statement?.kind ?: StatementKind.EXPENSE
     }
-    private val categoryField = ComboBox<Category>("Category").apply {
+    internal val categoryField = ComboBox<Category>("Category").apply {
         isRequired = true
         setItemLabelGenerator { it.description }
         setItems(categories)
         value = categories.firstOrNull { it.id == statement?.category?.id }
     }
-    private val accountField = ComboBox<Account>("Account").apply {
+    internal val accountField = ComboBox<Account>("Account").apply {
         isRequired = true
         setItemLabelGenerator { it.description }
         setItems(accounts)
@@ -50,14 +49,8 @@ internal class StatementFinancialFields(
         setItems(accounts)
         value = accounts.firstOrNull { it.id == statement?.destinationAccount?.id }
     }
-    private val accountFields = HorizontalLayout(categoryField, accountField, destinationAccountField).apply {
-        setWidthFull()
-        setWrap(true)
-        setFlexGrow(1.0, categoryField, accountField, destinationAccountField)
-    }
-
     init {
-        add(kindField, accountFields)
+        add(kindField, destinationAccountField)
         setWidthFull()
         setPadding(false)
         kindField.addValueChangeListener { updateVisibility() }

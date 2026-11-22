@@ -24,14 +24,28 @@ vaadin-grid::part(statement-amount-neutral) {
 
 .statement-inline-editor {
   box-sizing: border-box;
-  padding: var(--lumo-space-s) var(--lumo-space-m);
+  padding: var(--lumo-space-m) var(--lumo-space-l);
+  gap: var(--vaadin-gap-l);
   border: 1px solid var(--vaadin-border-color-secondary);
   border-radius: var(--vaadin-radius-m);
   background: var(--vaadin-background-container);
+  box-shadow: var(--vaadin-box-shadow-s);
 }
 
 .statement-inline-editor-row {
   gap: var(--vaadin-gap-m);
+}
+
+.statement-inline-editor-financial-row {
+  padding: var(--lumo-space-m) 0 0;
+  border-top: 1px solid var(--vaadin-border-color-secondary);
+}
+
+.statement-inline-editor-schedule-row {
+  padding: var(--lumo-space-m) var(--lumo-space-l);
+  border: 1px solid var(--vaadin-border-color-secondary);
+  border-radius: var(--vaadin-radius-s);
+  background: var(--vaadin-background-container);
 }
 
 .view-header {
@@ -53,16 +67,23 @@ vaadin-grid::part(statement-amount-neutral) {
   min-width: 12rem;
 }
 
-.statement-inline-editor-options-row > * {
-  flex: 1 1 0;
-  min-width: 18rem;
+.statement-inline-editor-primary-row > vaadin-combo-box {
+  flex: 1 1 12rem;
+  min-width: 10rem;
 }
 
 .statement-inline-editor-actions {
   justify-content: flex-end;
+  padding: var(--lumo-space-m) 0 0;
+  border-top: 1px solid var(--vaadin-border-color-secondary);
 }
 
 @media (max-width: 800px) {
+  .statement-inline-editor {
+    padding: var(--lumo-space-s);
+    gap: var(--vaadin-gap-m);
+  }
+
   .statement-inline-editor-row {
     flex-wrap: wrap;
   }

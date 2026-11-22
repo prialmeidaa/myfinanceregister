@@ -41,19 +41,28 @@ class StatementInlineEditor(
         width = "12rem"
     }
     private val scheduleFields = StatementScheduleFields(statement)
-    private val primaryFields = HorizontalLayout(dateField, descriptionField, amountField).apply {
+    private val primaryFields = HorizontalLayout(
+        dateField,
+        descriptionField,
+        financialFields.categoryField,
+        financialFields.accountField,
+        amountField
+    ).apply {
         setWidthFull()
         setWrap(true)
         setFlexGrow(1.0, descriptionField)
         addClassName("statement-inline-editor-row")
         addClassName("statement-inline-editor-primary-row")
     }
-    private val optionFields = HorizontalLayout(financialFields, scheduleFields).apply {
+    private val financialFieldsRow = HorizontalLayout(financialFields).apply {
         setWidthFull()
-        setWrap(true)
-        setFlexGrow(1.0, financialFields, scheduleFields)
         addClassName("statement-inline-editor-row")
-        addClassName("statement-inline-editor-options-row")
+        addClassName("statement-inline-editor-financial-row")
+    }
+    private val scheduleFieldsRow = HorizontalLayout(scheduleFields).apply {
+        setWidthFull()
+        addClassName("statement-inline-editor-row")
+        addClassName("statement-inline-editor-schedule-row")
     }
     private val actions = HorizontalLayout(
         Button("Cancel", { onCancel() }).apply {
@@ -70,7 +79,8 @@ class StatementInlineEditor(
     init {
         add(
             primaryFields,
-            optionFields,
+            financialFieldsRow,
+            scheduleFieldsRow,
             actions
         )
         setWidthFull()

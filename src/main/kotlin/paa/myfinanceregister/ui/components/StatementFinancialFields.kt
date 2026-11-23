@@ -21,7 +21,9 @@ internal class StatementFinancialFields(
     statement: Statement?,
     private val includeSelectionFields: Boolean = false
 ) : VerticalLayout() {
-    private val kindField = RadioButtonGroup<StatementKind>("Transaction type").apply {
+    internal val kindField = RadioButtonGroup<StatementKind>().apply {
+        label = ""
+        addClassName("statement-inline-editor-kind")
         setItems(StatementKind.entries)
         setItemLabelGenerator {
             when (it) {
@@ -46,7 +48,7 @@ internal class StatementFinancialFields(
         setItems(accounts)
         value = accounts.firstOrNull { it.id == statement?.account?.id }
     }
-    private val destinationAccountField = ComboBox<Account>("Destination account").apply {
+    internal val destinationAccountField = ComboBox<Account>("Destination account").apply {
         isRequired = true
         setMaxWidth(SELECTION_FIELD_MAX_WIDTH)
         setItemLabelGenerator { it.description }

@@ -24,8 +24,8 @@ vaadin-grid::part(statement-amount-neutral) {
 
 .statement-inline-editor {
   box-sizing: border-box;
-  padding: var(--lumo-space-m) var(--lumo-space-l);
-  gap: var(--vaadin-gap-l);
+  padding: 1.25rem 2rem;
+  gap: 1.25rem;
   border: 1px solid var(--vaadin-border-color-secondary);
   border-radius: var(--vaadin-radius-m);
   background: var(--vaadin-background-container);
@@ -36,21 +36,70 @@ vaadin-grid::part(statement-amount-neutral) {
   gap: var(--vaadin-gap-m);
 }
 
+.statement-inline-editor-kind-header {
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--vaadin-border-color-secondary);
+}
+
+.statement-inline-editor-kind-header vaadin-radio-group {
+  max-width: 100%;
+}
+
+vaadin-radio-group.statement-inline-editor-horizontal-options::part(group-field),
+vaadin-radio-group.statement-inline-editor-kind::part(group-field) {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+
+vaadin-radio-group.statement-inline-editor-horizontal-options
+  > vaadin-radio-button + vaadin-radio-button,
+vaadin-radio-group.statement-inline-editor-kind
+  > vaadin-radio-button + vaadin-radio-button {
+  margin-inline-start: 1.25rem;
+}
+
+vaadin-integer-field.statement-inline-editor-installment-field::part(label) {
+  white-space: nowrap;
+  box-sizing: border-box;
+  height: 2.8em;
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 0.25rem;
+}
+
+.statement-inline-editor-installment-fields {
+  gap: 1.25rem;
+}
+
 .statement-inline-editor-financial-row {
-  padding: var(--lumo-space-m) 0 0;
+  padding: 0.75rem 0 0;
   border-top: 1px solid var(--vaadin-border-color-secondary);
 }
 
-.statement-inline-editor-schedule-row {
-  padding: var(--lumo-space-m) var(--lumo-space-l);
-  border: 1px solid var(--vaadin-border-color-secondary);
-  border-radius: var(--vaadin-radius-s);
+.statement-inline-editor-schedule-options {
   background: var(--vaadin-background-container);
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+vaadin-details.statement-inline-editor-schedule-options vaadin-details-summary {
+  padding: 0.75rem 1.25rem;
+  margin: 0;
+}
+
+.statement-inline-editor-schedule-options::part(content) {
+  padding: 1.25rem;
+  border-top: 1px solid var(--vaadin-border-color-secondary);
+}
+
+.statement-inline-editor-schedule-fields {
+  gap: 0.75rem;
 }
 
 .view-header {
-  gap: var(--lumo-space-s);
-  margin-bottom: var(--lumo-space-s);
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .view-header vaadin-multi-select-combo-box {
@@ -74,14 +123,14 @@ vaadin-grid::part(statement-amount-neutral) {
 
 .statement-inline-editor-actions {
   justify-content: flex-end;
-  padding: var(--lumo-space-m) 0 0;
+  padding: 0.75rem 0 0;
   border-top: 1px solid var(--vaadin-border-color-secondary);
 }
 
 @media (max-width: 800px) {
   .statement-inline-editor {
-    padding: var(--lumo-space-s);
-    gap: var(--vaadin-gap-m);
+    padding: 0.5rem;
+    gap: 0.75rem;
   }
 
   .statement-inline-editor-row {

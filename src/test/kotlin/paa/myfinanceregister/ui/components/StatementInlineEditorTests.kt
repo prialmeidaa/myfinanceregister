@@ -4,6 +4,7 @@ import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.datepicker.DatePicker
+import com.vaadin.flow.component.details.Details
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.textfield.BigDecimalField
 import com.vaadin.flow.component.textfield.TextField
@@ -128,16 +129,20 @@ class StatementInlineEditorTests {
     @Test
     fun inlineEditorGroupsFieldsIntoAlignedRows() {
         val editor = StatementInlineEditor(emptyList(), emptyList(), statement(), { _, _ -> false }, {})
+        val descendants = descendants(editor)
         val rows = editor.children.toList().filterIsInstance<HorizontalLayout>()
 
         assertThat(editor.classNames).contains("statement-inline-editor")
         assertThat(rows).hasSize(4)
-        assertThat(rows[0].classNames).contains("statement-inline-editor-primary-row")
-        assertThat(rows[1].classNames).contains("statement-inline-editor-financial-row")
-        assertThat(rows[2].classNames).contains("statement-inline-editor-schedule-row")
+        assertThat(rows[0].classNames).contains("statement-inline-editor-kind-header")
+        assertThat(rows[1].classNames).contains("statement-inline-editor-primary-row")
+        assertThat(rows[2].classNames).contains("statement-inline-editor-financial-row")
         assertThat(rows[3].classNames).contains("statement-inline-editor-actions")
-        assertThat(rows[0].children.toList()).hasSize(5)
-        assertThat(rows[2].children.toList()).hasSize(1)
+        assertThat(rows[1].children.toList()).hasSize(5)
+        assertThat(descendants.filterIsInstance<Details>().single().summaryText).isEqualTo("More options")
+        assertThat(descendants.filterIsInstance<Details>().single().isOpened).isFalse()
+        assertThat(descendants.filterIsInstance<RadioButtonGroup<StatementKind>>()
+            .single { it.classNames.contains("statement-inline-editor-kind") }.label).isEmpty()
     }
 
     @Test
@@ -157,7 +162,7 @@ class StatementInlineEditorTests {
         )
         val components = descendants(editor)
         components.filterIsInstance<RadioButtonGroup<StatementKind>>()
-            .single { it.label == "Transaction type" }.value = StatementKind.TRANSFER
+            .single { it.classNames.contains("statement-inline-editor-kind") }.value = StatementKind.TRANSFER
         components.filterIsInstance<ComboBox<Account>>().single { it.label == "Origin account" }.value = origin
         components.filterIsInstance<ComboBox<Account>>().single { it.label == "Destination account" }.value = destination
 

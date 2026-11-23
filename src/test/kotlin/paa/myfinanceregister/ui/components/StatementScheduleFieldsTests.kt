@@ -26,6 +26,11 @@ class StatementScheduleFieldsTests {
         components.filterIsInstance<IntegerField>().first { it.label == "Total installments" }.value = 3
 
         assertThat(components.filterIsInstance<IntegerField>().all { it.isVisible }).isTrue()
+        components.filterIsInstance<IntegerField>().forEach {
+            assertThat(it.width).isEqualTo("10rem")
+            assertThat(it.max).isEqualTo(99)
+            assertThat(it.classNames).contains("statement-inline-editor-installment-field")
+        }
         components.filterIsInstance<Button>().single { it.text == "Save" }.click()
         assertThat(submitted?.transactionType).isEqualTo(StatementTransactionType.INSTALLMENT)
         assertThat(submitted?.installmentNumber).isEqualTo(1)
@@ -39,6 +44,7 @@ class StatementScheduleFieldsTests {
         val note = descendants(fields).filterIsInstance<Paragraph>().single()
 
         assertThat(typeField.value).isEqualTo(StatementTransactionType.SINGLE)
+        assertThat(typeField.classNames).contains("statement-inline-editor-horizontal-options")
         assertThat(note.isVisible).isFalse()
         typeField.value = StatementTransactionType.RECURRING
         assertThat(note.text).contains("end of the current year")
